@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.openclassrooms.p12m_joiefull"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.openclassrooms.p12m_joiefull"
-        minSdk = 25
-        targetSdk = 34
+        minSdk = 31
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
