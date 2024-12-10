@@ -1,7 +1,7 @@
 package com.openclassrooms.p12m_joiefull.di
 
 import com.openclassrooms.p12m_joiefull.data.network.ItemsClient
-import com.openclassrooms.p12m_joiefull.data.repository.ItemsRepository
+import com.openclassrooms.p12m_joiefull.data.repository.CategoriesRepository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient
@@ -77,12 +77,12 @@ val dataModule: Module = module {
     }
 
     /**
-     * Provides an [ItemsRepository] instance with dependency on [ItemsClient].
+     * Provides an [CategoriesRepository] instance with dependency on [ItemsClient].
      *
      * The repository abstracts the network layer and provides data to the view models.
      * It relies on [ItemsClient] to fetch the items data from the API.
      *
-     * @return An instance of [ItemsRepository] for accessing items data.
+     * @return An instance of [CategoriesRepository] for accessing items data.
      */
-    single { ItemsRepository(get()) }
+    single { CategoriesRepository(get()) }
 }

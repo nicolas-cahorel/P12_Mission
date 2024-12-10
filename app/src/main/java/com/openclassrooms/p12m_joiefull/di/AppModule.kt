@@ -1,7 +1,7 @@
 package com.openclassrooms.p12m_joiefull.di
 
-import com.openclassrooms.p12m_joiefull.data.repository.ItemsRepository
-import com.openclassrooms.p12m_joiefull.ui.ItemsViewModel
+import com.openclassrooms.p12m_joiefull.data.repository.CategoriesRepository
+import com.openclassrooms.p12m_joiefull.ui.CategoriesViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -32,24 +32,24 @@ val appModule = module {
      * Provides the ItemsRepository using the ItemsClient.
      *
      * The repository is responsible for fetching data from the API and processing it.
-     * This instance will be injected wherever an [ItemsRepository] is needed.
+     * This instance will be injected wherever an [CategoriesRepository] is needed.
      *
-     * @return An instance of [ItemsRepository] that interacts with the API client.
+     * @return An instance of [CategoriesRepository] that interacts with the API client.
      */
     single {
-        ItemsRepository(get())
+        CategoriesRepository(get())
     }
 
     /**
      * Provides the ItemsViewModel.
      *
-     * The view model interacts with the [ItemsRepository] to fetch and display item data.
+     * The view model interacts with the [CategoriesRepository] to fetch and display item data.
      * It is lifecycle-aware and provides data to the UI layer.
      *
-     * @return An instance of [ItemsViewModel] that handles UI-related logic for items.
+     * @return An instance of [CategoriesViewModel] that handles UI-related logic for items.
      */
     viewModel {
-        ItemsViewModel(get())
+        CategoriesViewModel(get())
     }
 
 }

@@ -1,17 +1,10 @@
 package com.openclassrooms.p12m_joiefull.data.apiResponse
 
+import com.openclassrooms.p12m_joiefull.data.model.Category
+import com.openclassrooms.p12m_joiefull.data.model.Item
+import com.openclassrooms.p12m_joiefull.data.model.Picture
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-
-/**
- * Represents the response containing a list of items fetched from the API.
- *
- * @property items The list of items returned by the API.
- */
-@JsonClass(generateAdapter = true)
-data class ItemsList(
-    @Json(name = "items") val items: List<ItemsApiResponse>
-)
 
 /**
  * Represents the details of an item in the API response.
@@ -27,7 +20,7 @@ data class ItemsList(
 @JsonClass(generateAdapter = true)
 data class ItemsApiResponse(
     @Json(name = "id") val id: Int,
-    @Json(name = "picture") val picture: Picture,
+    @Json(name = "picture") val picture: PictureApiResponse,
     @Json(name = "name") val name: String,
     @Json(name = "category") val category: String,
     @Json(name = "likes") val likes: Int,
@@ -36,13 +29,42 @@ data class ItemsApiResponse(
 )
 
 /**
- * Represents the picture details of an item.
+ * Represents the picture details of an item in the API response.
  *
  * @property url The URL of the picture.
- * @property description The description of the picture.
+ * @property description A textual description of the picture.
  */
 @JsonClass(generateAdapter = true)
-data class Picture(
+data class PictureApiResponse(
     @Json(name = "url") val url: String,
     @Json(name = "description") val description: String
 )
+
+/**
+ * Extension function to transform a list of [ItemsApiResponse] into a list of [Category],
+ * where each category contains the grouped items.
+ *
+ * @return A list of [Category] objects, each containing a name and a list of corresponding [Item] objects.
+ */
+fun List<ItemsApiResponse>.categorizedItems():List<Category> {
+
+    // Group the items by their category name.
+    val categories = this.groupBy { it.category }
+
+    // Transform the grouped data into a list of Category objects.
+    return categories.map { (categoryName, itemsInCategory) ->
+        Category(
+            name = categoryName,
+            items = itemsInCategory.map { items ->
+                Item(
+                    id = items.id,
+                    picture = Picture(items.picture.url, items.picture.description),
+                    name = items.name,
+                    likes = items.likes,
+                    price = items.price,
+                    originalPrice = items.originalPrice
+                )
+            }
+        )
+    }
+}
