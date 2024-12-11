@@ -30,29 +30,29 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(text = "Bienvenue, $name!", modifier = modifier)
 }
 
-@Composable
-fun LazyColumn() {
-    Colomn(){
-        titre()
-        lazyrow()
-    }
+//@Composable
+//fun LazyColumn() {
+//    Colomn(){
+//        titre()
+//        lazyrow()
+//    }
 
 //TODO: display items sorted by category
-}
+//}
 
-@Preview
-@Composable
-fun Title() {
-    val categoriesViewModel: CategoriesViewModel = koinViewModel()
-    val categoriesList = categoriesViewModel.categories.collectAsState(initial = emptyList())
-    val categoryToDisplayIndex = 0
-
-    Text(
-        text = if (categoriesList.value.isNotEmpty() && categoryToDisplayIndex < categoriesList.value.size) {
-            categoriesList.value[categoryToDisplayIndex]
-        } else {
-            "No category available"
-        }
-    )
-}
+//@Preview
+//@Composable
+//fun Title() {
+//    val categoriesViewModel: CategoriesViewModel = koinViewModel()
+//    val categoriesList = categoriesViewModel.categories.collectAsState(initial = emptyList())
+//    val categoryToDisplayIndex = 0
+//
+//    Text(
+//        text = if (categoriesList.value.isNotEmpty() && categoryToDisplayIndex < categoriesList.value.size) {
+//            categoriesList.value[categoryToDisplayIndex]
+//        } else {
+//            "No category available"
+//        }
+//    )
+//}
 
