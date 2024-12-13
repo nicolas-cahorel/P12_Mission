@@ -68,6 +68,7 @@ data class Category(
  * @property picture The picture details associated with the item.
  * @property name The name or title of the item.
  * @property likes The number of likes or endorsements the item has received.
+ * @property float TODO
  * @property price The current price of the item.
  * @property originalPrice The original price of the item before any discounts.
  */
@@ -76,6 +77,7 @@ data class Item(
     val picture: Picture,
     val name: String,
     val likes: Int,
+    val rating: Float,
     val price: Double,
     val originalPrice: Double
 )

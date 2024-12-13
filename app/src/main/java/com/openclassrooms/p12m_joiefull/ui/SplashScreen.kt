@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,18 +18,10 @@ fun SplashScreen() {
 
     val extendedColors = LocalExtendedColors.current
 
-    Surface(
-
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-            color = extendedColors.orange
-        )
-
-    ) {
-
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+                .background(
+                    color = extendedColors.orange),
             contentAlignment = Alignment.Center // Centre l'image dans le Box
         ) {
 
@@ -39,5 +30,5 @@ fun SplashScreen() {
                 contentDescription = "Logo de l'application"
             )
         }
-    }
+
 }

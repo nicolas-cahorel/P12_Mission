@@ -5,6 +5,7 @@ import com.openclassrooms.p12m_joiefull.data.model.Item
 import com.openclassrooms.p12m_joiefull.data.model.Picture
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import kotlin.random.Random
 
 /**
  * Represents the details of an item in the API response.
@@ -61,6 +62,7 @@ fun List<ItemsApiResponse>.categorizedItems():List<Category> {
                     picture = Picture(items.picture.url, items.picture.description),
                     name = items.name,
                     likes = items.likes,
+                    rating = Random.nextDouble(1.0, 5.0).toFloat(),
                     price = items.price,
                     originalPrice = items.originalPrice
                 )
