@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -43,46 +44,51 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.openclassrooms.p12m_joiefull.R
+import com.openclassrooms.p12m_joiefull.data.model.Item
+import com.openclassrooms.p12m_joiefull.data.model.Picture
 import com.openclassrooms.p12m_joiefull.ui.theme.LocalExtendedColors
 
 
 @Composable
-fun DetailsColumn(
-    url: String,
-    description: String,
-    likes: Int,
-    name: String,
-    rating: Float,
-    price: Double,
-    originalPrice: Double,
-    userAvatar: String
-) {
+fun DetailsScreen(item: Item) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        PictureBox(url, description, likes)
+        PictureBox(
+            url = item.picture.url,
+            description = item.picture.description,
+            likes = item.likes
+        )
         Spacer(modifier = Modifier.height(25.dp))
-        DescriptionColumn(name, rating, price, originalPrice, description)
+        DescriptionColumn(
+            name = item.name,
+            rating = item.rating,
+            price = item.price,
+            originalPrice = item.originalPrice,
+            description = item.picture.description)
         Spacer(modifier = Modifier.height(16.dp))
-        UserInput(userAvatar)
+        UserInput(url = "https://xsgames.co/randomusers/assets/avatars/male/0.jpg")
     }
 }
 @Preview(showBackground = true)
 @Composable
 private fun PreviewDetailsColumn() {
-    DetailsColumn(
-        url = "https://xsgames.co/randomusers/assets/avatars/male/0.jpg", // URL de l'image
-        description = "Pull vert forêt à motif torsadé élégant, tricot finement travaillé avec manches bouffantes et col montant; doux et chalereux.", // Description du produit
-        likes = 24, // Nombre de likes
+    val item = Item(
+        id = 1,
+        picture = Picture(
+            url = "https://xsgames.co/randomusers/assets/avatars/male/0.jpg", // URL de l'image
+            description = "Pull vert forêt à motif torsadé élégant, tricot finement travaillé avec manches bouffantes et col montant; doux et chalereux.", // Description du produit
+        ),
         name = "Pull torsadé", // Nom du produit
+        likes = 24, // Nombre de likes
         rating = 4.6f, // Évaluation du produit
         price = 69.99, // Prix du produit
         originalPrice = 95.00, // Ancien prix du produit
-        userAvatar = "https://xsgames.co/randomusers/assets/avatars/male/0.jpg" // Avatar de l'utilisateur
     )
+    DetailsScreen(item = item)
 }
 
 @Composable
@@ -336,7 +342,8 @@ private fun UserInput(url: String) {
                         fontSize = 14.sp
                     ),
                 )
-            }
+            },
+            shape = RoundedCornerShape(15.dp)
         )
     }
 }
