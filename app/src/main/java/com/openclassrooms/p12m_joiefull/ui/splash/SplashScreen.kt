@@ -1,4 +1,4 @@
-package com.openclassrooms.p12m_joiefull.ui
+package com.openclassrooms.p12m_joiefull.ui.splash
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,19 +12,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.openclassrooms.p12m_joiefull.R
+import com.openclassrooms.p12m_joiefull.ui.Routes
 import com.openclassrooms.p12m_joiefull.ui.theme.LocalExtendedColors
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(navController: NavController) {
+
+    val extendedColors = LocalExtendedColors.current
+
     LaunchedEffect(Unit) {
-        delay(1000)
+        delay(2000)
         navController.navigate(Routes.Products.route) {
             popUpTo(Routes.Splash.route) { inclusive = true }
         }
     }
-    val extendedColors = LocalExtendedColors.current
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -33,7 +35,6 @@ fun SplashScreen(navController: NavController) {
             ),
         contentAlignment = Alignment.Center // Centre l'image dans le Box
     ) {
-
         Image(
             painter = painterResource(id = R.drawable.joiefull_logo),
             contentDescription = "Logo de l'application"

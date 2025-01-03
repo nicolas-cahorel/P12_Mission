@@ -4,26 +4,37 @@
     <!-- Permission to access the Internet -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Déclaration des intentions utilisées par l'application -->
+    <queries>
+        <!-- Déclare les intentions pour l'action SEND avec du texte -->
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="text/plain" />
+        </intent>
+    </queries>
+
     <application
+        android:name=".MainApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/j_logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.P12M_joiefull"
-        >
+        android:theme="@style/Theme.P12M_joiefull">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.P12M_joiefull">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

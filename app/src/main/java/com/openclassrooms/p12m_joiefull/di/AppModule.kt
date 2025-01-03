@@ -1,7 +1,8 @@
 package com.openclassrooms.p12m_joiefull.di
 
 import com.openclassrooms.p12m_joiefull.data.repository.CategoriesRepository
-import com.openclassrooms.p12m_joiefull.ui.CategoriesViewModel
+import com.openclassrooms.p12m_joiefull.ui.details.DetailsViewModel
+import com.openclassrooms.p12m_joiefull.ui.products.ProductsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -46,10 +47,14 @@ val appModule = module {
      * The view model interacts with the [CategoriesRepository] to fetch and display item data.
      * It is lifecycle-aware and provides data to the UI layer.
      *
-     * @return An instance of [CategoriesViewModel] that handles UI-related logic for items.
+     * @return An instance of [ProductsViewModel] that handles UI-related logic for items.
      */
     viewModel {
-        CategoriesViewModel(get())
+        ProductsViewModel(get())
+    }
+
+    viewModel {
+        DetailsViewModel(get())
     }
 
 }

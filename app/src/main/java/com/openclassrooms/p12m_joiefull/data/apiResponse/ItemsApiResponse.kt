@@ -62,7 +62,7 @@ fun List<ItemsApiResponse>.categorizedItems():List<Category> {
                     picture = Picture(items.picture.url, items.picture.description),
                     name = items.name,
                     likes = items.likes,
-                    rating = Random.nextDouble(1.0, 5.0).toFloat(),
+                    rating = (Random.nextDouble(1.0, 5.0).toFloat() * 10).toInt() / 10f,
                     price = items.price,
                     originalPrice = items.originalPrice
                 )

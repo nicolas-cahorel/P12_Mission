@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.openclassrooms.p12m_joiefull"
-        minSdk = 31
+        minSdk = 33
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -82,4 +82,7 @@ dependencies {
 
     // Coil for Compose
     implementation(libs.coil.compose)
+
+    // Gson Serialization
+    implementation(libs.gson)
 }

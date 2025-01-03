@@ -1,5 +1,7 @@
-package com.openclassrooms.p12m_joiefull.ui
+package com.openclassrooms.p12m_joiefull.ui.products
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -14,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
@@ -21,6 +24,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,7 +45,11 @@ import com.openclassrooms.p12m_joiefull.R
 import com.openclassrooms.p12m_joiefull.data.model.Category
 import com.openclassrooms.p12m_joiefull.data.model.Item
 import com.openclassrooms.p12m_joiefull.data.model.Picture
+import com.openclassrooms.p12m_joiefull.ui.Routes
+import com.openclassrooms.p12m_joiefull.ui.details.DetailsViewModel
 import com.openclassrooms.p12m_joiefull.ui.theme.LocalExtendedColors
+import org.koin.androidx.compose.koinViewModel
+
 
 @Composable
 fun ProductsScreen(
@@ -95,7 +107,7 @@ private fun CategoriesColumn(
             )
             ProductsRow(
                 navController = navController,
-                products = category.items)
+                items = category.items)
 
         }
     }
@@ -104,21 +116,14 @@ private fun CategoriesColumn(
 @Composable
 private fun ProductsRow(
     navController: NavController,
-    products: List<Item>,
+    items: List<Item>,
     modifier: Modifier = Modifier
 ) {
     LazyRow(modifier = modifier.padding(horizontal = 8.dp)) {
-        items(products) { product ->
+        items(items) { item ->
             ProductColumn(
                 navController = navController,
-                id = product.id,
-                imageUrl = product.picture.url,
-                imageDescription = product.picture.description,
-                likesCount = product.likes,
-                name = product.name,
-                rating = product.rating,
-                price = product.price,
-                originalPrice = product.originalPrice,
+                item = item,
                 modifier = Modifier.padding(end = 8.dp)
             )
         }
@@ -128,34 +133,45 @@ private fun ProductsRow(
 @Composable
 private fun ProductColumn(
     navController: NavController,
-    id: Int,
-    imageUrl: String,
-    imageDescription: String,
-    likesCount: Int,
-    name: String,
-    rating: Float,
-    price: Double,
-    originalPrice: Double,
-    modifier: Modifier = Modifier
+    item: Item,
+    modifier: Modifier = Modifier,
+    detailsViewModel: DetailsViewModel = koinViewModel()
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val collectedItem by detailsViewModel.item.collectAsState(initial = null)
+
     Column(
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
             .clickable {
-                navController.navigate("details/$id")
+                try {
+                    detailsViewModel.loadItemById(item.id)
+                } catch (e: Exception) {
+                    Log.e("ProductClick", "Navigation failed: ${e.message}", e)
+                    Toast.makeText(context, "Une erreur est survenue lors du chargement de l'article : ${e.message}", Toast.LENGTH_SHORT).show()
+                }
             }
     ) {
         PictureBox(
-            url = imageUrl,
-            description = imageDescription,
-            likes = likesCount
+            url = item.picture.url,
+            description = item.picture.description,
+            likes = item.likes
         )
         InformationBox(
-            name = name,
-            rating = rating,
-            price = price,
-            originalPrice = originalPrice
+            name = item.name,
+            rating = item.rating,
+            price = item.price,
+            originalPrice = item.originalPrice
         )
+    }
+    // Observer `collectedItem` pour naviguer après que l'élément soit chargé
+    LaunchedEffect(collectedItem) {
+        // Si l'élément a bien été chargé et qu'il correspond à l'item cliqué, alors on navigue
+        collectedItem?.let { loadedItem ->
+            if (loadedItem.id == item.id) {
+                navController.navigate(Routes.Details.route)
+            }
+        }
     }
 }
 
@@ -165,6 +181,9 @@ private fun PictureBox(
     description: String,
     likes: Int
 ) {
+
+    val isFavorite= rememberSaveable { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .size(180.dp) // Taille ajustée pour ressembler au design
@@ -194,12 +213,13 @@ private fun PictureBox(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.Default.FavoriteBorder,
-                contentDescription = null,
+                imageVector = if (isFavorite.value) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                contentDescription = if (isFavorite.value) "Remove from favorites" else "Add to favorites",
                 tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .size(16.dp)
                     .padding(end = 4.dp)
+                    .clickable { isFavorite.value = !isFavorite.value }
             )
             Text(
                 text = likes.toString(),
@@ -426,23 +446,26 @@ private fun PreviewProductsRow() {
             originalPrice = 34.99
         )
     )
-    ProductsRow(products = sampleProducts, navController = fakeNavController)
+    ProductsRow(items = sampleProducts, navController = fakeNavController)
 }
 
 @Preview
 @Composable
 private fun PreviewProductColumn() {
     val fakeNavController = rememberNavController() // NavController factice pour la Preview
-    ProductColumn(
-        navController = fakeNavController,
+    val fakeItem = Item(
         id = 1,
-        imageUrl = "https://xsgames.co/randomusers/assets/avatars/male/0.jpg",
-        imageDescription = "Picture of a person",
-        likesCount = 24,
+        picture = Picture(url = "https://xsgames.co/randomusers/assets/avatars/male/0.jpg", description = "Picture of a person"),
+        likes = 24,
         name = "Gym Nastyk",
         rating = 3.5f,
         price = 19.99,
         originalPrice = 29.99
+    )
+
+    ProductColumn(
+        navController = fakeNavController,
+        item = fakeItem
     )
 }
 
