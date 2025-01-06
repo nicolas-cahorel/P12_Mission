@@ -1,7 +1,5 @@
 package com.openclassrooms.p12m_joiefull.ui.products
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -44,7 +42,6 @@ import coil.compose.AsyncImage
 import com.openclassrooms.p12m_joiefull.R
 import com.openclassrooms.p12m_joiefull.data.model.Category
 import com.openclassrooms.p12m_joiefull.data.model.Item
-import com.openclassrooms.p12m_joiefull.data.model.Picture
 import com.openclassrooms.p12m_joiefull.ui.Routes
 import com.openclassrooms.p12m_joiefull.ui.details.DetailsViewModel
 import com.openclassrooms.p12m_joiefull.ui.theme.LocalExtendedColors
@@ -56,7 +53,8 @@ fun ProductsScreen(
     navController: NavController,
     categories: List<Category>,
     errorMessage: String?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigateToDetail: (Item) -> Unit
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -69,7 +67,11 @@ fun ProductsScreen(
         ) {
             when {
                 categories.isNotEmpty() -> {
-                    CategoriesColumn(categories = categories, navController = navController)
+                    CategoriesColumn(
+                        categories = categories,
+                        navController = navController,
+                        navigateToDetail = navigateToDetail
+                    )
                 }
                 errorMessage != null -> {
                     Text(
@@ -95,7 +97,8 @@ fun ProductsScreen(
 private fun CategoriesColumn(
     categories: List<Category>,
     navController: NavController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigateToDetail: (Item) -> Unit
 ) {
     LazyColumn(modifier = modifier.padding(0.dp)) {
         items(categories) { category ->
@@ -107,7 +110,9 @@ private fun CategoriesColumn(
             )
             ProductsRow(
                 navController = navController,
-                items = category.items)
+                navigateToDetail = navigateToDetail,
+                items = category.items
+            )
 
         }
     }
@@ -117,14 +122,16 @@ private fun CategoriesColumn(
 private fun ProductsRow(
     navController: NavController,
     items: List<Item>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigateToDetail: (Item) -> Unit
 ) {
     LazyRow(modifier = modifier.padding(horizontal = 8.dp)) {
         items(items) { item ->
             ProductColumn(
                 navController = navController,
                 item = item,
-                modifier = Modifier.padding(end = 8.dp)
+                modifier = Modifier.padding(end = 8.dp),
+                navigateToDetail = navigateToDetail
             )
         }
     }
@@ -133,6 +140,7 @@ private fun ProductsRow(
 @Composable
 private fun ProductColumn(
     navController: NavController,
+    navigateToDetail: (Item) -> Unit,
     item: Item,
     modifier: Modifier = Modifier,
     detailsViewModel: DetailsViewModel = koinViewModel()
@@ -144,17 +152,19 @@ private fun ProductColumn(
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
             .clickable {
-                try {
-                    detailsViewModel.loadItemById(item.id)
-                } catch (e: Exception) {
-                    Log.e("ProductClick", "Navigation failed: ${e.message}", e)
-                    Toast.makeText(context, "Une erreur est survenue lors du chargement de l'article : ${e.message}", Toast.LENGTH_SHORT).show()
-                }
+                navigateToDetail(item)
+
+//                try {
+//                    detailsViewModel.loadItemById(item.id)
+//                } catch (e: Exception) {
+//                    Log.e("ProductClick", "Navigation failed: ${e.message}", e)
+//                    Toast.makeText(context, "Une erreur est survenue lors du chargement de l'article : ${e.message}", Toast.LENGTH_SHORT).show()
+//                }
             }
     ) {
         PictureBox(
-            url = item.picture.url,
-            description = item.picture.description,
+            url = item.url,
+            description = item.description,
             likes = item.likes
         )
         InformationBox(
@@ -315,22 +325,22 @@ private fun PreviewProductsScreen() {
         listOf(
             Category(
                 "Hauts", listOf(
-                    Item(1, Picture("url", "Veste urbaine"), "Veste urbaine", 24, 4.3f, 89.00, 120.00),
-                    Item(2, Picture("url", "Pull torsadé"), "Pull torsadé", 56, 4.6f, 69.00, 95.00)
+                    Item(1, "url", "Veste urbaine", "Veste urbaine", 24, 4.3f, 89.00, 120.00),
+                    Item(2, "url", "Pull torsadé", "Pull torsadé", 56, 4.6f, 69.00, 95.00)
                 )
             ),
 
             Category(
                 "Bas", listOf(
-                    Item(3, Picture("url", "Jean slim"), "Jean slim", 40, 4.3f, 49.00, 65.00),
-                    Item(4, Picture("url", "Pantalon large"), "Pantalon large", 38, 4.2f, 54.00, 70.00)
+                    Item(3, "url", "Jean slim", "Jean slim", 40, 4.3f, 49.00, 65.00),
+                    Item(4, "url", "Pantalon large", "Pantalon large", 38, 4.2f, 54.00, 70.00)
                 )
             ),
 
             Category(
                 "Sacs", listOf(
-                    Item(5, Picture("url", "Sac à dos"), "Sac à dos", 10, 2.5f, 12.00, 24.00),
-                    Item(6, Picture("url", "Sac à main"), "Sac à main", 20, 3.5f, 18.00, 36.00)
+                    Item(5, "url", "Sac à dos", "Sac à dos", 10, 2.5f, 12.00, 24.00),
+                    Item(6, "url", "Sac à main", "Sac à main", 20, 3.5f, 18.00, 36.00)
                 )
             )
         )
@@ -344,7 +354,11 @@ private fun PreviewProductsScreen() {
     ProductsScreen(
         navController = fakeNavController,
         categories = sampleCategories,
-        errorMessage = errorMessage
+        errorMessage = errorMessage,
+        modifier = Modifier,
+        navigateToDetail = { item ->
+            println("Navigating to detail of item: ${item.name}")
+        }
     )
 
 }
@@ -359,10 +373,8 @@ private fun PreviewCategoriesColumn() {
             items = listOf(
                 Item(
                     id = 1,
-                    picture = Picture(
-                        url = "https://xsgames.co/randomusers/assets/avatars/male/1.jpg",
-                        description = "Smartphone Image"
-                    ),
+                    url = "https://xsgames.co/randomusers/assets/avatars/male/1.jpg",
+                    description = "Smartphone Image",
                     name = "Smartphone",
                     likes = 100,
                     rating = 4.5f,
@@ -371,10 +383,8 @@ private fun PreviewCategoriesColumn() {
                 ),
                 Item(
                     id = 2,
-                    picture = Picture(
-                        url = "https://xsgames.co/randomusers/assets/avatars/female/2.jpg",
-                        description = "Laptop Image"
-                    ),
+                    url = "https://xsgames.co/randomusers/assets/avatars/female/2.jpg",
+                    description = "Laptop Image",
                     name = "Laptop",
                     likes = 150,
                     rating = 4.7f,
@@ -388,10 +398,8 @@ private fun PreviewCategoriesColumn() {
             items = listOf(
                 Item(
                     id = 3,
-                    picture = Picture(
-                        url = "https://xsgames.co/randomusers/assets/avatars/male/3.jpg",
-                        description = "Book Cover"
-                    ),
+                    url = "https://xsgames.co/randomusers/assets/avatars/male/3.jpg",
+                    description = "Book Cover",
                     name = "Science Fiction Book",
                     likes = 80,
                     rating = 4.2f,
@@ -401,7 +409,13 @@ private fun PreviewCategoriesColumn() {
             )
         )
     )
-    CategoriesColumn(categories = sampleCategories, navController = fakeNavController)
+    CategoriesColumn(
+        categories = sampleCategories,
+        navController = fakeNavController,
+        navigateToDetail = { item ->
+            println("Navigating to detail of item: ${item.name}")
+        }
+        )
 }
 
 @Preview(showBackground = true)
@@ -411,10 +425,8 @@ private fun PreviewProductsRow() {
     val sampleProducts = listOf(
         Item(
             id = 1,
-            picture = Picture(
-                url = "https://xsgames.co/randomusers/assets/avatars/male/1.jpg",
-                description = "Product 1 Image"
-            ),
+            url = "https://xsgames.co/randomusers/assets/avatars/male/1.jpg",
+            description = "Product 1 Image",
             name = "Product 1",
             likes = 120,
             rating = 4.5f,
@@ -423,10 +435,8 @@ private fun PreviewProductsRow() {
         ),
         Item(
             id = 2,
-            picture = Picture(
-                url = "https://xsgames.co/randomusers/assets/avatars/female/2.jpg",
-                description = "Product 2 Image"
-            ),
+            url = "https://xsgames.co/randomusers/assets/avatars/female/2.jpg",
+            description = "Product 2 Image",
             name = "Product 2",
             likes = 75,
             rating = 3.8f,
@@ -435,10 +445,8 @@ private fun PreviewProductsRow() {
         ),
         Item(
             id = 3,
-            picture = Picture(
-                url = "https://xsgames.co/randomusers/assets/avatars/male/3.jpg",
-                description = "Product 3 Image"
-            ),
+            url = "https://xsgames.co/randomusers/assets/avatars/male/3.jpg",
+            description = "Product 3 Image",
             name = "Product 3",
             likes = 200,
             rating = 4.9f,
@@ -446,7 +454,13 @@ private fun PreviewProductsRow() {
             originalPrice = 34.99
         )
     )
-    ProductsRow(items = sampleProducts, navController = fakeNavController)
+    ProductsRow(
+        items = sampleProducts,
+        navController = fakeNavController,
+        navigateToDetail = { item ->
+            println("Navigating to detail of item: ${item.name}")
+        }
+        )
 }
 
 @Preview
@@ -455,7 +469,8 @@ private fun PreviewProductColumn() {
     val fakeNavController = rememberNavController() // NavController factice pour la Preview
     val fakeItem = Item(
         id = 1,
-        picture = Picture(url = "https://xsgames.co/randomusers/assets/avatars/male/0.jpg", description = "Picture of a person"),
+        url = "https://xsgames.co/randomusers/assets/avatars/male/0.jpg",
+        description = "Picture of a person",
         likes = 24,
         name = "Gym Nastyk",
         rating = 3.5f,
@@ -465,7 +480,10 @@ private fun PreviewProductColumn() {
 
     ProductColumn(
         navController = fakeNavController,
-        item = fakeItem
+        item = fakeItem,
+        navigateToDetail = { item ->
+            println("Navigating to detail of item: ${item.name}")
+        }
     )
 }
 

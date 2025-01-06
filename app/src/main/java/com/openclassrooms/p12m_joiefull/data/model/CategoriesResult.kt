@@ -74,7 +74,8 @@ data class Category(
  */
 data class Item(
     val id: Int,
-    val picture: Picture,
+    val url: String,
+    val description: String,
     val name: String,
     val likes: Int,
     val rating: Float,
@@ -90,7 +91,7 @@ data class Item(
  * @property url The URL where the picture is hosted.
  * @property description A textual description of the picture.
  */
-data class Picture(
-    val url: String,
-    val description: String
-)
+//data class Picture(
+//    val url: String,
+//    val description: String
+//)

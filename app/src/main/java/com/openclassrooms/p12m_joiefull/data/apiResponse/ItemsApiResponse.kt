@@ -2,7 +2,6 @@ package com.openclassrooms.p12m_joiefull.data.apiResponse
 
 import com.openclassrooms.p12m_joiefull.data.model.Category
 import com.openclassrooms.p12m_joiefull.data.model.Item
-import com.openclassrooms.p12m_joiefull.data.model.Picture
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import kotlin.random.Random
@@ -59,7 +58,9 @@ fun List<ItemsApiResponse>.categorizedItems():List<Category> {
             items = itemsInCategory.map { items ->
                 Item(
                     id = items.id,
-                    picture = Picture(items.picture.url, items.picture.description),
+                    url = items.picture.url,
+                    description = items.picture.description,
+//                    picture = Picture(items.picture.url, items.picture.description),
                     name = items.name,
                     likes = items.likes,
                     rating = (Random.nextDouble(1.0, 5.0).toFloat() * 10).toInt() / 10f,

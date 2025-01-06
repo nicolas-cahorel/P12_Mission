@@ -71,8 +71,8 @@ fun DetailsScreen(
     ) {
         PictureBox(
             navController = navController,
-            url = item.picture.url,
-            description = item.picture.description,
+            url = item.url,
+            description = item.description,
             likes = item.likes
         )
         Spacer(modifier = Modifier.height(25.dp))
@@ -81,7 +81,7 @@ fun DetailsScreen(
             rating = item.rating,
             price = item.price,
             originalPrice = item.originalPrice,
-            description = item.picture.description
+            description = item.description
         )
         Spacer(modifier = Modifier.height(16.dp))
         UserInput(url = "https://xsgames.co/randomusers/assets/avatars/male/0.jpg")
