@@ -38,16 +38,9 @@ class ProductsViewModel(
     private var _categories = MutableStateFlow<List<Category>>(emptyList())
     val categories: StateFlow<List<Category>> get() = _categories
 
-    // Flag to ensure categories are loaded only once.
-    private var isCategoriesLoaded = false
-
     init {
-        // Load categories only if they haven't been loaded yet
-        if (!isCategoriesLoaded) {
             loadCategories()
-            isCategoriesLoaded = true
         }
-    }
 
     /**
      * Fetches the list of categories from the repository and emits the result.

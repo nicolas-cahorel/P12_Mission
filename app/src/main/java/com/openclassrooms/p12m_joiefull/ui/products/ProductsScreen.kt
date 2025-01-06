@@ -22,9 +22,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -42,10 +39,7 @@ import coil.compose.AsyncImage
 import com.openclassrooms.p12m_joiefull.R
 import com.openclassrooms.p12m_joiefull.data.model.Category
 import com.openclassrooms.p12m_joiefull.data.model.Item
-import com.openclassrooms.p12m_joiefull.ui.Routes
-import com.openclassrooms.p12m_joiefull.ui.details.DetailsViewModel
 import com.openclassrooms.p12m_joiefull.ui.theme.LocalExtendedColors
-import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
@@ -53,8 +47,7 @@ fun ProductsScreen(
     navController: NavController,
     categories: List<Category>,
     errorMessage: String?,
-    modifier: Modifier = Modifier,
-    navigateToDetail: (Item) -> Unit
+    modifier: Modifier = Modifier
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -69,8 +62,7 @@ fun ProductsScreen(
                 categories.isNotEmpty() -> {
                     CategoriesColumn(
                         categories = categories,
-                        navController = navController,
-                        navigateToDetail = navigateToDetail
+                        navController = navController
                     )
                 }
                 errorMessage != null -> {
@@ -97,8 +89,7 @@ fun ProductsScreen(
 private fun CategoriesColumn(
     categories: List<Category>,
     navController: NavController,
-    modifier: Modifier = Modifier,
-    navigateToDetail: (Item) -> Unit
+    modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier.padding(0.dp)) {
         items(categories) { category ->
@@ -110,7 +101,6 @@ private fun CategoriesColumn(
             )
             ProductsRow(
                 navController = navController,
-                navigateToDetail = navigateToDetail,
                 items = category.items
             )
 
@@ -123,15 +113,13 @@ private fun ProductsRow(
     navController: NavController,
     items: List<Item>,
     modifier: Modifier = Modifier,
-    navigateToDetail: (Item) -> Unit
 ) {
     LazyRow(modifier = modifier.padding(horizontal = 8.dp)) {
         items(items) { item ->
             ProductColumn(
                 navController = navController,
                 item = item,
-                modifier = Modifier.padding(end = 8.dp),
-                navigateToDetail = navigateToDetail
+                modifier = Modifier.padding(end = 8.dp)
             )
         }
     }
@@ -140,26 +128,15 @@ private fun ProductsRow(
 @Composable
 private fun ProductColumn(
     navController: NavController,
-    navigateToDetail: (Item) -> Unit,
     item: Item,
     modifier: Modifier = Modifier,
-    detailsViewModel: DetailsViewModel = koinViewModel()
 ) {
-    val context = androidx.compose.ui.platform.LocalContext.current
-    val collectedItem by detailsViewModel.item.collectAsState(initial = null)
 
     Column(
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
             .clickable {
-                navigateToDetail(item)
-
-//                try {
-//                    detailsViewModel.loadItemById(item.id)
-//                } catch (e: Exception) {
-//                    Log.e("ProductClick", "Navigation failed: ${e.message}", e)
-//                    Toast.makeText(context, "Une erreur est survenue lors du chargement de l'article : ${e.message}", Toast.LENGTH_SHORT).show()
-//                }
+                navController.navigate("details/${item.id}")
             }
     ) {
         PictureBox(
@@ -173,15 +150,6 @@ private fun ProductColumn(
             price = item.price,
             originalPrice = item.originalPrice
         )
-    }
-    // Observer `collectedItem` pour naviguer après que l'élément soit chargé
-    LaunchedEffect(collectedItem) {
-        // Si l'élément a bien été chargé et qu'il correspond à l'item cliqué, alors on navigue
-        collectedItem?.let { loadedItem ->
-            if (loadedItem.id == item.id) {
-                navController.navigate(Routes.Details.route)
-            }
-        }
     }
 }
 
@@ -355,12 +323,8 @@ private fun PreviewProductsScreen() {
         navController = fakeNavController,
         categories = sampleCategories,
         errorMessage = errorMessage,
-        modifier = Modifier,
-        navigateToDetail = { item ->
-            println("Navigating to detail of item: ${item.name}")
-        }
+        modifier = Modifier
     )
-
 }
 
 @Preview(showBackground = true)
@@ -411,10 +375,7 @@ private fun PreviewCategoriesColumn() {
     )
     CategoriesColumn(
         categories = sampleCategories,
-        navController = fakeNavController,
-        navigateToDetail = { item ->
-            println("Navigating to detail of item: ${item.name}")
-        }
+        navController = fakeNavController
         )
 }
 
@@ -456,10 +417,7 @@ private fun PreviewProductsRow() {
     )
     ProductsRow(
         items = sampleProducts,
-        navController = fakeNavController,
-        navigateToDetail = { item ->
-            println("Navigating to detail of item: ${item.name}")
-        }
+        navController = fakeNavController
         )
 }
 
@@ -480,10 +438,7 @@ private fun PreviewProductColumn() {
 
     ProductColumn(
         navController = fakeNavController,
-        item = fakeItem,
-        navigateToDetail = { item ->
-            println("Navigating to detail of item: ${item.name}")
-        }
+        item = fakeItem
     )
 }
 

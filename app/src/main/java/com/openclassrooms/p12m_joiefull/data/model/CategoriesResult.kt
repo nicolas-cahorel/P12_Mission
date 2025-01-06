@@ -82,16 +82,3 @@ data class Item(
     val price: Double,
     val originalPrice: Double
 )
-
-/**
- * Represents the details of a picture associated with an item.
- *
- * A picture provides visual context for an item.
- *
- * @property url The URL where the picture is hosted.
- * @property description A textual description of the picture.
- */
-//data class Picture(
-//    val url: String,
-//    val description: String
-//)

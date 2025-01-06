@@ -1,7 +1,6 @@
 package com.openclassrooms.p12m_joiefull.di
 
 import com.openclassrooms.p12m_joiefull.data.repository.CategoriesRepository
-import com.openclassrooms.p12m_joiefull.ui.details.DetailsViewModel
 import com.openclassrooms.p12m_joiefull.ui.products.ProductsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -51,10 +50,6 @@ val appModule = module {
      */
     viewModel {
         ProductsViewModel(get())
-    }
-
-    viewModel {
-        DetailsViewModel(get())
     }
 
 }
