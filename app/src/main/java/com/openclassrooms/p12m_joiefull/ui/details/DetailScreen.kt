@@ -2,6 +2,8 @@ package com.openclassrooms.p12m_joiefull.ui.details
 
 import android.content.Context
 import android.content.Intent
+import android.view.MotionEvent
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +16,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,12 +29,13 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -38,14 +43,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -55,45 +66,81 @@ import com.openclassrooms.p12m_joiefull.R
 import com.openclassrooms.p12m_joiefull.data.model.Item
 import com.openclassrooms.p12m_joiefull.ui.theme.LocalExtendedColors
 
+/**
+ * Composable function to display the detail screen of an item.
+ *
+ * @param navController The navigation controller used for navigation.
+ * @param state The current state of the screen (Loading, Error, or DisplayDetail).
+ */
 @Composable
-fun DetailsScreen(
+fun DetailScreen(
     navController: NavController,
-    item: Item,
+    state: DetailScreenState,
 ) {
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp)
-    ) {
-        PictureBox(
-            navController = navController,
-            url = item.url,
-            description = item.description,
-            likes = item.likes
-        )
-        Spacer(modifier = Modifier.height(25.dp))
-        DescriptionColumn(
-            name = item.name,
-            rating = item.rating,
-            price = item.price,
-            originalPrice = item.originalPrice,
-            description = item.description
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        UserInput(url = "https://xsgames.co/randomusers/assets/avatars/male/0.jpg")
+    when (state) {
+        // Display loading indicator
+        is DetailScreenState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        // Display error message
+        is DetailScreenState.Error -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = state.message,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+
+        // Display the details of selected item
+        is DetailScreenState.DisplayDetail -> {
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp)
+            ) {
+                PictureBox(
+                    navController = navController,
+                    item = state.item
+                )
+                Spacer(modifier = Modifier.height(25.dp))
+                DescriptionColumn(
+                    item = state.item
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                UserInput(url = "https://xsgames.co/randomusers/assets/avatars/male/0.jpg")
+            }
+        }
     }
 }
 
+/**
+ * Displays the image and interaction options (favorite, share, back).
+ *
+ * @param navController The navigation controller for handling back navigation.
+ * @param item The item whose details are being displayed.
+ */
 @Composable
 private fun PictureBox(
     navController: NavController,
-    url: String,
-    description: String,
-    likes: Int
+    item: Item
 ) {
     val isFavorite = rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Box(
         modifier = Modifier
@@ -103,18 +150,18 @@ private fun PictureBox(
             .background(MaterialTheme.colorScheme.surface)
     ) {
 
-        // Image occupant toute la box
+        // Image display with rounded corners
         AsyncImage(
-            model = url,
-            contentDescription = description,
+            model = item.url,
+            contentDescription = item.description,
             modifier = Modifier
                 .fillMaxSize()
-                .clip(MaterialTheme.shapes.medium), // Applique les coins arrondis
-            contentScale = ContentScale.Crop, // Remplit la box en coupant si nécessaire
+                .clip(MaterialTheme.shapes.medium),
+            contentScale = ContentScale.Crop,
             placeholder = painterResource(id = R.drawable.ic_launcher_background)
         )
 
-        // Groupe icône + likes en bas à droite
+        // Favorite icon and likes counter
         Row(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -136,11 +183,13 @@ private fun PictureBox(
                     .clickable { isFavorite.value = !isFavorite.value }
             )
             Text(
-                text = likes.toString(),
+                text = item.likes.toString(),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
+
+        // Share icon
         Icon(
             imageVector = Icons.Default.Share,
             contentDescription = null,
@@ -154,8 +203,17 @@ private fun PictureBox(
                 )
                 .size(24.dp)
                 .padding(3.dp)
-//                .clickable { shareContent(context, "Check out this awesome content: https://example.com") }
+                .clickable {
+                    val shareText = "Check out this item: ${item.name}\n" +
+                            "Description: ${item.description}\n" +
+                            "Price: ${item.price}€\n" +
+                            "Original Price: ${item.originalPrice}€\n" +
+                            "Link: ${item.url}"
+                    shareContent(context, shareText)
+                }
         )
+
+        // Back button icon
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = null,
@@ -175,38 +233,41 @@ private fun PictureBox(
     }
 }
 
+/**
+ * Displays the item's description and additional details (name, price, original price, etc.).
+ *
+ * @param item The item whose details are being displayed.
+ */
 @Composable
 private fun DescriptionColumn(
-    name: String,
-    rating: Float,
-    price: Double,
-    originalPrice: Double,
-    description: String
+    item: Item
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
     ) {
-        InformationBox(name, rating, price, originalPrice)
+        InformationBox(item)
 
         Text(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 15.dp),
-            text = description,
+            text = item.description,
             style = MaterialTheme.typography.bodySmall.copy(fontSize = 14.sp),
             color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
 
+/**
+ * Displays a box containing the item's name, rating, price, and original price.
+ *
+ * @param item The item whose details are being displayed.
+ */
 @Composable
 private fun InformationBox(
-    name: String,
-    rating: Float,
-    price: Double,
-    originalPrice: Double
+    item: Item
 ) {
 
     val extendedColors = LocalExtendedColors.current
@@ -218,19 +279,22 @@ private fun InformationBox(
             .background(MaterialTheme.colorScheme.surface)
     ) {
 
-        // nom de l'article
+        // Item name
         Text(
             modifier = Modifier
-                .align(Alignment.TopStart),
-            text = name,
+                .align(Alignment.TopStart)
+                .widthIn(max = 200.dp),
+            text = item.name,
             style = MaterialTheme.typography.bodySmall.copy(
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             ),
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 2, // Permet un nombre illimité de lignes
+            overflow = TextOverflow.Ellipsis // Si le texte dépasse, il sera tronqué
         )
 
-        // Groupe icône + evaluation en bas à droite
+        // Rating display
         Row(
             modifier = Modifier
                 .align(Alignment.TopEnd),
@@ -245,28 +309,28 @@ private fun InformationBox(
                     .padding(end = 2.dp)
             )
             Text(
-                text = rating.toString(),
+                text = item.rating.toString(),
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 14.sp),
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
 
-        // prix de l'article
+        // Price
         Text(
             modifier = Modifier
                 .align(Alignment.BottomStart),
-            text = price.toString() + "€",
+            text = item.price.toString() + "€",
             style = MaterialTheme.typography.bodySmall.copy(fontSize = 14.sp),
             color = MaterialTheme.colorScheme.onSurface
         )
 
-        // ancien prix de l'article
+        // Original price
         Text(
             modifier = Modifier
                 .align(Alignment.BottomEnd),
-            text = originalPrice.toString() + "€",
+            text = item.originalPrice.toString() + "€",
             style = MaterialTheme.typography.bodySmall.copy(
-                textDecoration = TextDecoration.LineThrough, // Applique le barré
+                textDecoration = TextDecoration.LineThrough,
                 fontSize = 14.sp
             ),
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
@@ -274,33 +338,43 @@ private fun InformationBox(
     }
 }
 
+/**
+ * Displays a user input section for commenting and rating the item.
+ *
+ * @param url The URL of the user's avatar.
+ */
 @Composable
 private fun UserInput(url: String) {
 
-    var userRating by remember { mutableIntStateOf(0) } // Variable mutable pour le rating
     var userComment by rememberSaveable { mutableStateOf("") }
+    val ratingState = rememberSaveable { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
     ) {
 
+        // Avatar and rating bar
         Row(verticalAlignment = Alignment.CenterVertically) {
             AsyncImage(
                 model = url,
                 contentDescription = "user's avatar",
                 modifier = Modifier
-                    .padding(end = 6.dp)
+                    .padding(end = 8.dp)
                     .size(40.dp)
                     .clip(CircleShape), // Applique les coins arrondis
 
                 contentScale = ContentScale.Crop, // Remplit la box en coupant si nécessaire
                 placeholder = painterResource(id = R.drawable.ic_launcher_background)
             )
-            StarRating(
-                rating = userRating,
-                onRatingChanged = { newRating -> userRating = newRating })
+
+            UserRatingBar(
+                ratingState = ratingState,
+                size = 40.dp,
+            )
         }
+
+        // User's comment input
         OutlinedTextField(
             value = userComment,
             onValueChange = {
@@ -323,42 +397,94 @@ private fun UserInput(url: String) {
     }
 }
 
+/**
+ * Displays a star rating bar for user feedback.
+ *
+ * @param size The size of each star.
+ * @param ratingState The state representing the user's rating.
+ */
 @Composable
-private fun StarRating(
-    rating: Int,
-    onRatingChanged: (Int) -> Unit,
-    modifier: Modifier = Modifier
+private fun UserRatingBar(
+    size: Dp = 64.dp,
+    ratingState: MutableState<Int> = remember { mutableIntStateOf(0) },
 ) {
+    val extendedColors = LocalExtendedColors.current
+
     Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier.wrapContentSize(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Affiche les 5 étoiles
-        for (i in 1..5) {
-            IconButton(
-                onClick = { onRatingChanged(i) } // Définit la nouvelle note lorsque l'étoile est cliquée
-            ) {
-                Icon(
-                    imageVector = if (i <= rating) Icons.Outlined.Star else Icons.Default.Star,
-                    contentDescription = "Rate $i stars",
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    modifier = Modifier.size(24.dp) // Taille des étoiles
-                )
-            }
+        // 2. Star Icon Generation Loop
+        for (value in 1..5) {
+            StarIcon(
+                size = size,
+                ratingValue = value,
+                ratingState = ratingState,
+                selectedColor = extendedColors.orange,
+                unselectedColor = Color(0xFFA2ADB1)
+            )
         }
     }
 }
 
+/**
+ * A composable function that displays a star icon for rating purposes.
+ *
+ * @param size The size of the star icon.
+ * @param ratingState The current rating state (keeps track of the user's rating).
+ * @param ratingValue The specific rating value for this star (1-5).
+ * @param selectedColor The color of the star when it's selected (filled).
+ * @param unselectedColor The color of the star when it's unselected (empty).
+ */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun ShareContent(context: Context, content: String) {
+fun StarIcon(
+    size: Dp,
+    ratingState: MutableState<Int>,
+    ratingValue: Int,
+    selectedColor: Color,
+    unselectedColor: Color
+) {
+    // Color animation based on the current rating
+    val tint by animateColorAsState(
+        targetValue = if (ratingValue <= ratingState.value) selectedColor else unselectedColor,
+        label = ""
+    )
+
+    // Determine which icon to use based on the rating value
+    val icon = if (ratingValue <= ratingState.value) Icons.Outlined.Star else Icons.Default.Star
+
+    Icon(
+        imageVector = icon,
+        tint = tint,
+        contentDescription = null,
+        modifier = Modifier
+            .size(size)
+            .pointerInteropFilter {
+                when (it.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        ratingState.value = ratingValue
+                    }
+                }
+                true
+            }
+    )
+}
+
+/**
+ * Share the content using Android's share intent.
+ *
+ * @param context The context used for invoking the share action.
+ * @param content The text to be shared.
+ */
+private fun shareContent(context: Context, content: String) {
 
     val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain" // Type MIME pour le texte
         putExtra(Intent.EXTRA_TEXT, content) // Contenu à partager
     }
 
-    // Vérifiez si une application peut gérer l'intent
     if (intent.resolveActivity(context.packageManager) != null) {
         context.startActivity(Intent.createChooser(intent, "Share via"))
     }
@@ -366,90 +492,69 @@ private fun ShareContent(context: Context, content: String) {
 
 // PREVIEWS
 
-//// Classe qui simule le comportement de CategoriesViewModel
-//class FakeCategoriesViewModel : CategoriesViewModel() {
-//
-//    // Utiliser MutableStateFlow pour simuler un ViewModel réel
-//    private val _item = MutableStateFlow<Item?>(null)
-//    override val item: StateFlow<Item?> = _item
-//
-//    private val _errorMessage = MutableStateFlow<String?>(null)
-//    override val errorMessage: StateFlow<String?> = _errorMessage
-//
-//    // Simuler une mise à jour de l'item
-//    fun loadItem() {
-//        _item.value = Item(
-//            id = 1,
-//            name = "Pull torsadé",
-//            rating = 4.6f,
-//            price = 69.99,
-//            originalPrice = 95.00,
-//            likes = 120,
-//            picture = Picture(
-//                url = "https://example.com/pull-torsade.jpg",
-//                description = "Pull vert forêt à motif torsadé élégant."
-//            )
-//        )
-//    }
-//
-//    // Simuler un message d'erreur
-//    fun setErrorMessage(message: String) {
-//        _errorMessage.value = message
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+private fun PreviewDetailsScreen() {
+    val navController = rememberNavController()
+    val fakeState = DetailScreenState.DisplayDetail(
+        Item(
+            id = 1,
+            url = "https://xsgames.co/randomusers/assets/avatars/male/0.jpg",
+            description = "Pull vert forêt à motif torsadé élégant, tricot finement travaillé avec manches bouffantes et col montant; doux et chalereux.",
+            name = "Pull torsadé",
+            likes = 24,
+            rating = 4.6f,
+            price = 69.99,
+            originalPrice = 95.00,
+            category = "haut"
+        )
+    )
 
-//@Preview(showBackground = true)
-//@Composable
-//private fun PreviewDetailsScreen() {
-//    val item = Item(
-//        id = 1,
-//        picture = Picture(
-//            url = "https://xsgames.co/randomusers/assets/avatars/male/0.jpg", // URL de l'image
-//            description = "Pull vert forêt à motif torsadé élégant, tricot finement travaillé avec manches bouffantes et col montant; doux et chalereux.", // Description du produit
-//        ),
-//        name = "Pull torsadé", // Nom du produit
-//        likes = 24, // Nombre de likes
-//        rating = 4.6f, // Évaluation du produit
-//        price = 69.99, // Prix du produit
-//        originalPrice = 95.00, // Ancien prix du produit
-//    )
-//    DetailsScreen(itemId = item.id)
-//}
+    DetailScreen(
+        navController = navController,
+        state = fakeState
+    )
+}
 
 @Preview
 @Composable
 private fun PreviewPictureBox() {
     val navController = rememberNavController()
+    val fakeItem = Item(
+        id = 1,
+        url = "https://xsgames.co/randomusers/assets/avatars/male/0.jpg",
+        description = "Pull vert forêt à motif torsadé élégant, tricot finement travaillé avec manches bouffantes et col montant; doux et chalereux.",
+        name = "Pull torsadé",
+        likes = 24,
+        rating = 4.6f,
+        price = 69.99,
+        originalPrice = 95.00,
+        category = "haut"
+    )
 
     PictureBox(
         navController = navController,
-        url = "https://xsgames.co/randomusers/assets/avatars/male/0.jpg",
-        description = "Picture of a person",
-        likes = 24
+        item = fakeItem
     )
 }
 
 @Preview
 @Composable
 private fun PreviewDescriptionColumn() {
-    // Exemple de données factices pour la preview
-    DescriptionColumn(
+    val fakeItem = Item(
+        id = 1,
+        url = "https://xsgames.co/randomusers/assets/avatars/male/0.jpg",
+        description = "Pull vert forêt à motif torsadé élégant, tricot finement travaillé avec manches bouffantes et col montant; doux et chalereux.",
         name = "Pull torsadé",
+        likes = 24,
         rating = 4.6f,
         price = 69.99,
         originalPrice = 95.00,
-        description = "Pull vert forêt à motif torsadé élégant, tricot finement travaillé avec manches bouffantes et col montant; doux et chalereux."
+        category = "haut"
     )
-}
-
-@Preview
-@Composable
-private fun PreviewInformationBox() {
-    InformationBox(
-        name = "Pull torsadé",
-        rating = 4.6f,
-        price = 69.99,
-        originalPrice = 95.00
+    // Exemple de données factices pour la preview
+    DescriptionColumn(
+        item = fakeItem
     )
 }
 
@@ -459,16 +564,3 @@ private fun PreviewUserInput() {
     UserInput(url = "https://example.com/avatar.jpg")
 }
 
-@Preview
-@Composable
-private fun PreviewStarRating() {
-    var rating by remember { mutableIntStateOf(0) } // État local pour la note
-    Box(
-        modifier = Modifier.background(Color.White) // Applique un fond blanc
-    ) {
-        StarRating(
-            rating = 0,
-            onRatingChanged = { newRating -> rating = newRating }
-        )
-    }
-}

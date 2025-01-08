@@ -16,6 +16,14 @@ import com.openclassrooms.p12m_joiefull.ui.Routes
 import com.openclassrooms.p12m_joiefull.ui.theme.LocalExtendedColors
 import kotlinx.coroutines.delay
 
+/**
+ * Composable function representing the splash screen of the application.
+ *
+ * The splash screen displays the logo of the application for a brief period before navigating
+ * to the products screen. The navigation is done using [NavController].
+ *
+ * @param navController The [NavController] used for navigation after the splash screen.
+ */
 @Composable
 fun SplashScreen(navController: NavController) {
 
@@ -35,12 +43,16 @@ fun SplashScreen(navController: NavController) {
             ),
         contentAlignment = Alignment.Center // Centre l'image dans le Box
     ) {
+
+        // Display the application logo.
         Image(
             painter = painterResource(id = R.drawable.joiefull_logo),
             contentDescription = "Logo de l'application"
         )
     }
 }
+
+// PREVIEW
 
 @Preview(showBackground = true)
 @Composable

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -17,9 +18,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +31,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -41,57 +44,70 @@ import com.openclassrooms.p12m_joiefull.data.model.Category
 import com.openclassrooms.p12m_joiefull.data.model.Item
 import com.openclassrooms.p12m_joiefull.ui.theme.LocalExtendedColors
 
-
+/**
+ * Main composable function that displays the Home screen.
+ *
+ * This screen shows the list of product categories and their associated items.
+ * It handles loading, error, and display states through the [HomeScreenState].
+ *
+ * @param navController The [NavController] used for navigation between screens.
+ * @param state The state of the [HomeScreenState], determining the UI to display.
+ */
 @Composable
-fun ProductsScreen(
+fun HomeScreen(
     navController: NavController,
-    categories: List<Category>,
-    errorMessage: String?,
-    modifier: Modifier = Modifier
+    state: HomeScreenState
 ) {
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background
-    ) { innerPadding ->
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            when {
-                categories.isNotEmpty() -> {
-                    CategoriesColumn(
-                        categories = categories,
-                        navController = navController
-                    )
-                }
-                errorMessage != null -> {
-                    Text(
-                        text = errorMessage,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-                else -> {
-                    Text(
-                        text = "Loading...",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
+
+    when (state) {
+
+        // Display loading indicator
+        is HomeScreenState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
             }
+        }
+
+        // Display error message
+        is HomeScreenState.Error -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = state.message,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+
+        // Display the list of categories and related items
+        is HomeScreenState.DisplayItems -> {
+            CategoriesColumn(
+                categories = state.categories,
+                navController = navController
+            )
         }
     }
 }
 
+/**
+ * Composable function that displays a list of categories and their associated products.
+ *
+ * @param categories The list of categories to be displayed.
+ * @param navController The [NavController] for navigating to product details.
+ */
 @Composable
 private fun CategoriesColumn(
     categories: List<Category>,
-    navController: NavController,
-    modifier: Modifier = Modifier
+    navController: NavController
 ) {
-    LazyColumn(modifier = modifier.padding(0.dp)) {
+    LazyColumn(modifier = Modifier.padding(0.dp)) {
         items(categories) { category ->
             Text(
                 text = category.name,
@@ -108,13 +124,18 @@ private fun CategoriesColumn(
     }
 }
 
+/**
+ * Composable function that displays a horizontal list of products within a category.
+ *
+ * @param navController The [NavController] for navigating to product details.
+ * @param items The list of items to be displayed.
+ */
 @Composable
 private fun ProductsRow(
     navController: NavController,
-    items: List<Item>,
-    modifier: Modifier = Modifier,
+    items: List<Item>
 ) {
-    LazyRow(modifier = modifier.padding(horizontal = 8.dp)) {
+    LazyRow(modifier = Modifier.padding(horizontal = 8.dp)) {
         items(items) { item ->
             ProductColumn(
                 navController = navController,
@@ -125,6 +146,13 @@ private fun ProductsRow(
     }
 }
 
+/**
+ * Composable function that displays a single product with its image and information.
+ *
+ * @param navController The [NavController] for navigating to the product details screen.
+ * @param item The [Item] representing the product to be displayed.
+ * @param modifier The [Modifier] used to decorate the composable UI.
+ */
 @Composable
 private fun ProductColumn(
     navController: NavController,
@@ -139,11 +167,15 @@ private fun ProductColumn(
                 navController.navigate("details/${item.id}")
             }
     ) {
+
+        // Show product image and likes
         PictureBox(
             url = item.url,
             description = item.description,
             likes = item.likes
         )
+
+        // Show product name, rating, price, and original price
         InformationBox(
             name = item.name,
             rating = item.rating,
@@ -153,6 +185,13 @@ private fun ProductColumn(
     }
 }
 
+/**
+ * Composable function that displays the product image and the like button with the number of likes.
+ *
+ * @param url The URL of the product image.
+ * @param description The description of the product image for accessibility.
+ * @param likes The number of likes for the product.
+ */
 @Composable
 private fun PictureBox(
     url: String,
@@ -160,7 +199,7 @@ private fun PictureBox(
     likes: Int
 ) {
 
-    val isFavorite= rememberSaveable { mutableStateOf(false) }
+    val isFavorite = rememberSaveable { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -168,7 +207,8 @@ private fun PictureBox(
             .clip(MaterialTheme.shapes.medium) // Coins arrondis
             .background(MaterialTheme.colorScheme.surface)
     ) {
-        // Image occupant toute la box
+
+        // Display the product image
         AsyncImage(
             model = url,
             contentDescription = description,
@@ -178,7 +218,8 @@ private fun PictureBox(
             contentScale = ContentScale.Crop, // Remplit la box en coupant si nécessaire
             placeholder = painterResource(id = R.drawable.ic_launcher_background)
         )
-        // Groupe icône + likes en bas à droite
+
+        // Display the like button and number of likes in the bottom-right corner
         Row(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -208,6 +249,14 @@ private fun PictureBox(
     }
 }
 
+/**
+ * Composable function that displays the product information, including name, rating, price, and original price.
+ *
+ * @param name The name of the product.
+ * @param rating The product's rating.
+ * @param price The current price of the product.
+ * @param originalPrice The original price of the product.
+ */
 @Composable
 private fun InformationBox(
     name: String,
@@ -220,21 +269,26 @@ private fun InformationBox(
     Box(
         modifier = Modifier
             .width(180.dp)
-            .height(40.dp) // Taille ajustée pour ressembler au design
+            .height(40.dp) // Adjust size to match the design
             .background(MaterialTheme.colorScheme.surface)
     ) {
-        // nom de l'article
+
+        // Display the product name
         Text(
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(2.dp),
+                .padding(2.dp)
+                .widthIn(max = 140.dp),
             text = name,
             style = MaterialTheme.typography.bodySmall.copy(
                 fontWeight = FontWeight.Bold
             ),
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1, // Permet un nombre illimité de lignes
+            overflow = TextOverflow.Ellipsis // Si le texte dépasse, il sera tronqué
         )
-        // Groupe icône + evaluation en bas à droite
+
+        // Display the product's rating
         Row(
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -255,7 +309,8 @@ private fun InformationBox(
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
-        // prix de l'article
+
+        // Display the current price
         Text(
             modifier = Modifier
                 .align(Alignment.BottomStart)
@@ -264,7 +319,8 @@ private fun InformationBox(
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurface
         )
-        // ancien prix de l'article
+
+        // Display the original price
         Text(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -285,45 +341,54 @@ private fun InformationBox(
 private fun PreviewProductsScreen() {
 
     val fakeNavController = rememberNavController()
-
-    val showCategories = false // true pour afficher des catégories, false pour tester les autres cas
-    val showError = true // true pour afficher un message d'erreur, false sinon
-
-    val sampleCategories = if (showCategories) {
+    val fakeState = HomeScreenState.DisplayItems(
         listOf(
             Category(
                 "Hauts", listOf(
-                    Item(1, "url", "Veste urbaine", "Veste urbaine", 24, 4.3f, 89.00, 120.00),
-                    Item(2, "url", "Pull torsadé", "Pull torsadé", 56, 4.6f, 69.00, 95.00)
+                    Item(
+                        1,
+                        "url",
+                        "Veste urbaine",
+                        "Veste urbaine",
+                        24,
+                        4.3f,
+                        89.00,
+                        120.00,
+                        "haut"
+                    ),
+                    Item(2, "url", "Pull torsadé", "Pull torsadé", 56, 4.6f, 69.00, 95.00, "haut")
                 )
             ),
 
             Category(
                 "Bas", listOf(
-                    Item(3, "url", "Jean slim", "Jean slim", 40, 4.3f, 49.00, 65.00),
-                    Item(4, "url", "Pantalon large", "Pantalon large", 38, 4.2f, 54.00, 70.00)
+                    Item(3, "url", "Jean slim", "Jean slim", 40, 4.3f, 49.00, 65.00, "bas"),
+                    Item(
+                        4,
+                        "url",
+                        "Pantalon large",
+                        "Pantalon large",
+                        38,
+                        4.2f,
+                        54.00,
+                        70.00,
+                        "bas"
+                    )
                 )
             ),
 
             Category(
                 "Sacs", listOf(
-                    Item(5, "url", "Sac à dos", "Sac à dos", 10, 2.5f, 12.00, 24.00),
-                    Item(6, "url", "Sac à main", "Sac à main", 20, 3.5f, 18.00, 36.00)
+                    Item(5, "url", "Sac à dos", "Sac à dos", 10, 2.5f, 12.00, 24.00, "accessoire"),
+                    Item(6, "url", "Sac à main", "Sac à main", 20, 3.5f, 18.00, 36.00, "accessoire")
                 )
             )
         )
+    )
 
-    } else {
-        emptyList()
-    }
-
-    val errorMessage = if (showError) "Une erreur est survenue lors du chargement." else null
-
-    ProductsScreen(
+    HomeScreen(
         navController = fakeNavController,
-        categories = sampleCategories,
-        errorMessage = errorMessage,
-        modifier = Modifier
+        state = fakeState
     )
 }
 
@@ -343,7 +408,8 @@ private fun PreviewCategoriesColumn() {
                     likes = 100,
                     rating = 4.5f,
                     price = 299.99,
-                    originalPrice = 349.99
+                    originalPrice = 349.99,
+                    category = "Electronics"
                 ),
                 Item(
                     id = 2,
@@ -353,7 +419,8 @@ private fun PreviewCategoriesColumn() {
                     likes = 150,
                     rating = 4.7f,
                     price = 999.99,
-                    originalPrice = 1199.99
+                    originalPrice = 1199.99,
+                    category = "Electronics"
                 )
             )
         ),
@@ -368,7 +435,8 @@ private fun PreviewCategoriesColumn() {
                     likes = 80,
                     rating = 4.2f,
                     price = 19.99,
-                    originalPrice = 24.99
+                    originalPrice = 24.99,
+                    category = "Books"
                 )
             )
         )
@@ -376,7 +444,7 @@ private fun PreviewCategoriesColumn() {
     CategoriesColumn(
         categories = sampleCategories,
         navController = fakeNavController
-        )
+    )
 }
 
 @Preview(showBackground = true)
@@ -392,7 +460,8 @@ private fun PreviewProductsRow() {
             likes = 120,
             rating = 4.5f,
             price = 19.99,
-            originalPrice = 24.99
+            originalPrice = 24.99,
+            category = "category1"
         ),
         Item(
             id = 2,
@@ -402,7 +471,8 @@ private fun PreviewProductsRow() {
             likes = 75,
             rating = 3.8f,
             price = 14.99,
-            originalPrice = 19.99
+            originalPrice = 19.99,
+            category = "category1"
         ),
         Item(
             id = 3,
@@ -412,13 +482,14 @@ private fun PreviewProductsRow() {
             likes = 200,
             rating = 4.9f,
             price = 29.99,
-            originalPrice = 34.99
+            originalPrice = 34.99,
+            category = "category1"
         )
     )
     ProductsRow(
         items = sampleProducts,
         navController = fakeNavController
-        )
+    )
 }
 
 @Preview
@@ -433,7 +504,8 @@ private fun PreviewProductColumn() {
         name = "Gym Nastyk",
         rating = 3.5f,
         price = 19.99,
-        originalPrice = 29.99
+        originalPrice = 29.99,
+        category = "category1"
     )
 
     ProductColumn(

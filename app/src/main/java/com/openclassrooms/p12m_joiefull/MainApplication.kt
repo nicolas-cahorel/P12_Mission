@@ -9,8 +9,8 @@ import org.koin.core.context.startKoin
 /**
  * The main application class for the Joiefull app.
  *
- * This class is used to initialize the Koin dependency injection framework. The application context
- * is provided to Koin, and the necessary modules are loaded to manage dependencies throughout
+ * This class is used to initialize the Koin dependency injection framework. It provides the
+ * application context to Koin and loads the necessary modules to manage dependencies throughout
  * the application's lifecycle.
  */
 class MainApplication : Application() {
@@ -19,11 +19,12 @@ class MainApplication : Application() {
      * Called when the application is starting, before any activity, service, or receiver objects
      * (excluding content providers) have been created.
      *
-     * This method is responsible for initializing Koin, which will manage the dependency injection
-     * throughout the app. It also sets the application context for Koin and loads the necessary modules.
+     * This method initializes Koin, which manages dependency injection across the application. It
+     * also provides the application context and loads the required modules for dependency management.
      */
     override fun onCreate() {
         super.onCreate()
+
         // Start Koin for dependency injection
         startKoin {
             // Provide the application context to Koin

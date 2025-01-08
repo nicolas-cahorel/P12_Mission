@@ -1,7 +1,8 @@
 package com.openclassrooms.p12m_joiefull.di
 
-import com.openclassrooms.p12m_joiefull.data.repository.CategoriesRepository
-import com.openclassrooms.p12m_joiefull.ui.products.ProductsViewModel
+import com.openclassrooms.p12m_joiefull.data.repository.ItemsRepository
+import com.openclassrooms.p12m_joiefull.ui.details.DetailScreenViewModel
+import com.openclassrooms.p12m_joiefull.ui.products.HomeScreenViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -9,47 +10,62 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 /**
- * Koin module for providing dependencies in the application.
+ * Dependency injection module for the application using Koin.
  *
- * This module defines how to provide instances of different components such as repositories,
- * view models, and coroutine scopes for the app. It uses Koin for dependency injection.
+ * This module provides the required dependencies such as repositories, view models,
+ * and coroutine scopes for the application. It ensures proper initialization
+ * and lifecycle management of these components.
  */
 val appModule = module {
 
     /**
-     * Provides a CoroutineScope for the application.
+     * Provides a [CoroutineScope] for the application.
      *
-     * This scope combines a SupervisorJob with the Main dispatcher,
-     * making it suitable for managing UI-related tasks and handling errors in coroutines.
+     * This scope is created with a [SupervisorJob] and uses the [Dispatchers.Main] dispatcher.
+     * It is intended for managing UI-related coroutine tasks and ensuring error isolation.
      *
-     * @return A [CoroutineScope] for the application.
+     * @return A [CoroutineScope] instance suitable for UI-level coroutines.
      */
     single {
         CoroutineScope(SupervisorJob() + Dispatchers.Main)
     }
 
     /**
-     * Provides the ItemsRepository using the ItemsClient.
+     * Provides a singleton instance of [ItemsRepository].
      *
-     * The repository is responsible for fetching data from the API and processing it.
-     * This instance will be injected wherever an [CategoriesRepository] is needed.
+     * The repository is responsible for handling data operations, including
+     * fetching data from the API and processing it. It interacts with the `ItemsClient` to
+     * retrieve item data and provides domain models to the application.
      *
-     * @return An instance of [CategoriesRepository] that interacts with the API client.
+     * @return A singleton instance of [ItemsRepository].
      */
     single {
-        CategoriesRepository(get())
+        ItemsRepository(get())
     }
 
     /**
-     * Provides the ItemsViewModel.
+     * Provides the [HomeScreenViewModel] instance.
      *
-     * The view model interacts with the [CategoriesRepository] to fetch and display item data.
-     * It is lifecycle-aware and provides data to the UI layer.
+     * This view model manages the logic for the home screen, interacting with the [ItemsRepository]
+     * to fetch and display categorized item data. It is lifecycle-aware and designed to survive
+     * configuration changes, such as screen rotations.
      *
-     * @return An instance of [ProductsViewModel] that handles UI-related logic for items.
+     * @return A [HomeScreenViewModel] instance.
      */
     viewModel {
-        ProductsViewModel(get())
+        HomeScreenViewModel(get())
     }
 
+    /**
+     * Provides the [DetailScreenViewModel] instance.
+     *
+     * This view model is responsible for handling the logic of the detail screen. It interacts with
+     * the [ItemsRepository] to fetch specific item details and supports various user interactions.
+     * It is lifecycle-aware and ensures data persistence during configuration changes.
+     *
+     * @return A [DetailScreenViewModel] instance.
+     */
+    viewModel {
+        DetailScreenViewModel(get())
+    }
 }
