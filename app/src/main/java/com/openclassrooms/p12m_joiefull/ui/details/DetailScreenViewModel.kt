@@ -23,6 +23,7 @@ import java.net.UnknownHostException
  * @property dispatcher The coroutine dispatcher for executing background tasks (default is [Dispatchers.IO]).
  */
 class DetailScreenViewModel(
+    itemId: Int,
     private val itemsRepository: ItemsRepository,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
@@ -31,6 +32,10 @@ class DetailScreenViewModel(
     private var _detailScreenState =
         MutableStateFlow<DetailScreenState>(DetailScreenState.Loading)
     val detailScreenState: StateFlow<DetailScreenState> get() = _detailScreenState
+
+    init {
+        loadItem(itemId)
+    }
 
     /**
      * Fetches the item details from the repository and updates the UI state.

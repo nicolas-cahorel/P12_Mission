@@ -1,5 +1,6 @@
-package com.openclassrooms.p12m_joiefull.ui
+package com.openclassrooms.p12m_joiefull.ui.navigation
 
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.navigation.compose.NavHost
@@ -11,9 +12,10 @@ import com.openclassrooms.p12m_joiefull.ui.products.HomeScreen
 import com.openclassrooms.p12m_joiefull.ui.products.HomeScreenViewModel
 import com.openclassrooms.p12m_joiefull.ui.splash.SplashScreen
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
-fun SetupNavForMediumSize() {
+fun SetupNavForSmartphone(widthSizeClass: WindowWidthSizeClass) {
 
     // Initialize the NavController to manage the navigation between screens.
     val navController = rememberNavController()
@@ -43,18 +45,19 @@ fun SetupNavForMediumSize() {
 
         // Details Screen: Displays detailed information about a specific item.
         composable(route = Routes.Details.route) { backStackEntry ->
+
             // Retrieve the item ID from the navigation arguments.
             val itemId = backStackEntry.arguments?.getString(Routes.Details.ARGUMENT)?.toIntOrNull()
+
             // Retrieve the DetailScreenViewModel using Koin for dependency injection.
-            val detailScreenViewModel: DetailScreenViewModel = koinViewModel()
+            val detailScreenViewModel: DetailScreenViewModel = koinViewModel { parametersOf(itemId) }
+
             // Collect the state of the DetailScreen and observe it.
             val detailScreenState = detailScreenViewModel.detailScreenState.collectAsState().value
-            // If an item ID is available, load the details for that item.
-            if (itemId != null) {
-                detailScreenViewModel.loadItem(itemId)
-            }
+
             // Pass the navigation controller and state to the DetailsScreen composable.
             DetailScreen(
+                widthSizeClass = widthSizeClass,
                 navController = navController,
                 state = detailScreenState
             )

@@ -5,14 +5,14 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import com.openclassrooms.p12m_joiefull.ui.MyApp
+import com.openclassrooms.p12m_joiefull.ui.navigation.Navigation
 import com.openclassrooms.p12m_joiefull.ui.theme.JoiefullTheme
 
 /**
  * Main activity for the Joiefull app.
  *
  * This activity is the entry point of the app. It uses Jetpack Compose to set the UI and applies
- * the app's theme using the [JoiefullTheme] composable. The UI is defined by the [MyApp] composable.
+ * the app's theme using the [JoiefullTheme] composable. The UI is defined by the [Navigation] composable.
  */
 class MainActivity : ComponentActivity() {
     /**
@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
             // Applying the app's theme to the content
             JoiefullTheme {
                 // Setting up the main composable of the app
-                MyApp(windowSizeClass)
+                Navigation(windowSizeClass)
             }
         }
     }

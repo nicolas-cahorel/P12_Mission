@@ -1,4 +1,4 @@
-package com.openclassrooms.p12m_joiefull.ui
+package com.openclassrooms.p12m_joiefull.ui.navigation
 
 
 /**

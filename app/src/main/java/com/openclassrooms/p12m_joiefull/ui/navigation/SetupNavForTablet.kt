@@ -1,21 +1,16 @@
-package com.openclassrooms.p12m_joiefull.ui
+package com.openclassrooms.p12m_joiefull.ui.navigation
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.openclassrooms.p12m_joiefull.R
 import com.openclassrooms.p12m_joiefull.ui.details.DetailScreen
 import com.openclassrooms.p12m_joiefull.ui.details.DetailScreenViewModel
 import com.openclassrooms.p12m_joiefull.ui.products.HomeScreen
@@ -23,10 +18,11 @@ import com.openclassrooms.p12m_joiefull.ui.products.HomeScreenViewModel
 import com.openclassrooms.p12m_joiefull.ui.splash.SplashScreen
 import com.openclassrooms.p12m_joiefull.ui.theme.LocalExtendedColors
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @SuppressLint("ComposableDestinationInComposeScope")
 @Composable
-fun SetupNavForExpandedSize() {
+fun SetupNavForTablet(widthSizeClass: WindowWidthSizeClass) {
 
     // Initialize the NavController to manage the navigation between screens.
     val navController = rememberNavController()
@@ -78,6 +74,7 @@ fun SetupNavForExpandedSize() {
 
                     // Pass the navigation controller and state to the DetailsScreen composable.
                     DetailScreen(
+                        widthSizeClass = widthSizeClass,
                         navController = navController,
                         state = detailScreenState
                     )
@@ -90,15 +87,13 @@ fun SetupNavForExpandedSize() {
         composable(route = Routes.Details.route) { backStackEntry ->
 
             // Retrieve the item ID from the navigation arguments.
-            val itemId =
-                backStackEntry.arguments?.getString(Routes.Details.ARGUMENT)?.toIntOrNull()
+            val itemId = backStackEntry.arguments?.getString(Routes.Details.ARGUMENT)?.toIntOrNull()
 
             // Retrieve the DetailScreenViewModel using Koin for dependency injection.
-            val detailScreenViewModel: DetailScreenViewModel = koinViewModel()
+            val detailScreenViewModel: DetailScreenViewModel = koinViewModel { parametersOf(itemId) }
 
             // Collect the state of the DetailScreen and observe it.
-            val detailScreenState =
-                detailScreenViewModel.detailScreenState.collectAsState().value
+            val detailScreenState = detailScreenViewModel.detailScreenState.collectAsState().value
 
             // If an item ID is available, load the details for that item.
             if (itemId != null) {
@@ -124,6 +119,7 @@ fun SetupNavForExpandedSize() {
                 Box(modifier = Modifier.weight(2f)) {
                     // Pass the navigation controller and state to the DetailsScreen composable.
                     DetailScreen(
+                        widthSizeClass = widthSizeClass,
                         navController = navController,
                         state = detailScreenState
                     )

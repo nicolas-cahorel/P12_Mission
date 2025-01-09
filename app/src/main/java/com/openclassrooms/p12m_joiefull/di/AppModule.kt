@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.module
 
 /**
@@ -56,6 +57,8 @@ val appModule = module {
         HomeScreenViewModel(get())
     }
 
+
+
     /**
      * Provides the [DetailScreenViewModel] instance.
      *
@@ -65,7 +68,10 @@ val appModule = module {
      *
      * @return A [DetailScreenViewModel] instance.
      */
-    viewModel {
-        DetailScreenViewModel(get())
-    }
+//    viewModel {
+//        DetailScreenViewModel(get())
+//    }
+
+    viewModel { (itemId: Int) -> DetailScreenViewModel(itemId,get()) }
+
 }

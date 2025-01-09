@@ -35,6 +35,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -75,6 +76,7 @@ import com.openclassrooms.p12m_joiefull.ui.theme.LocalExtendedColors
  */
 @Composable
 fun DetailScreen(
+    widthSizeClass: WindowWidthSizeClass,
     navController: NavController,
     state: DetailScreenState,
 ) {
@@ -128,6 +130,7 @@ fun DetailScreen(
                     .padding(16.dp)
             ) {
                 PictureBox(
+                    widthSizeClass = widthSizeClass,
                     navController = navController,
                     item = state.item
                 )
@@ -150,6 +153,7 @@ fun DetailScreen(
  */
 @Composable
 private fun PictureBox(
+    widthSizeClass: WindowWidthSizeClass,
     navController: NavController,
     item: Item
 ) {
@@ -227,25 +231,35 @@ private fun PictureBox(
                 }
         )
 
-        // Back button icon
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(16.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
-                    shape = CircleShape
+        when (widthSizeClass) {
+            WindowWidthSizeClass.Compact, WindowWidthSizeClass.Medium -> {
+                // Back button icon
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(16.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
+                            shape = CircleShape
+                        )
+                        .size(24.dp)
+                        .padding(3.dp)
+                        .clickable { navController.popBackStack() }
                 )
-                .size(24.dp)
-                .padding(3.dp)
-                .clickable { navController.popBackStack() }
-        )
+            }
 
+            else -> {
+                //do nothing
+            }
+        }
     }
+
+
 }
+
 
 /**
  * Displays the item's description and additional details (name, price, original price, etc.).
@@ -525,6 +539,7 @@ private fun PreviewDetailsScreen() {
     )
 
     DetailScreen(
+        widthSizeClass = WindowWidthSizeClass.Compact,
         navController = navController,
         state = fakeState
     )
@@ -547,6 +562,7 @@ private fun PreviewPictureBox() {
     )
 
     PictureBox(
+        widthSizeClass = WindowWidthSizeClass.Compact,
         navController = navController,
         item = fakeItem
     )

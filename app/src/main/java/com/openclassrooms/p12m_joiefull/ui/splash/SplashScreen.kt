@@ -12,7 +12,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.openclassrooms.p12m_joiefull.R
-import com.openclassrooms.p12m_joiefull.ui.Routes
+import com.openclassrooms.p12m_joiefull.ui.navigation.Routes
 import com.openclassrooms.p12m_joiefull.ui.theme.LocalExtendedColors
 import kotlinx.coroutines.delay
 
