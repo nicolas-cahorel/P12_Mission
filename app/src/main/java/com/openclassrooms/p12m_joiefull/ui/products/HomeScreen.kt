@@ -1,7 +1,9 @@
 package com.openclassrooms.p12m_joiefull.ui.products
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -59,15 +61,27 @@ fun HomeScreen(
     state: HomeScreenState
 ) {
 
+    val extendedColors = LocalExtendedColors.current
+
     when (state) {
 
         // Display loading indicator
         is HomeScreenState.Loading -> {
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = extendedColors.orange)
             ) {
-                CircularProgressIndicator()
+                Image(
+                    painter = painterResource(id = R.drawable.joiefull_logo),
+                    contentDescription = "Logo de l'application",
+                    modifier = Modifier.align(Alignment.Center)
+                )
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(top = 120.dp)
+                )
             }
         }
 

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.view.MotionEvent
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -78,14 +79,27 @@ fun DetailScreen(
     state: DetailScreenState,
 ) {
 
+    val extendedColors = LocalExtendedColors.current
+
     when (state) {
+
         // Display loading indicator
         is DetailScreenState.Loading -> {
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = extendedColors.orange)
             ) {
-                CircularProgressIndicator()
+                Image(
+                    painter = painterResource(id = R.drawable.joiefull_logo),
+                    contentDescription = "Logo de l'application",
+                    modifier = Modifier.align(Alignment.Center)
+                )
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(top = 120.dp)
+                )
             }
         }
 

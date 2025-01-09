@@ -41,7 +41,7 @@ fun SplashScreen(navController: NavController) {
             .background(
                 color = extendedColors.orange
             ),
-        contentAlignment = Alignment.Center // Centre l'image dans le Box
+        contentAlignment = Alignment.Center
     ) {
 
         // Display the application logo.

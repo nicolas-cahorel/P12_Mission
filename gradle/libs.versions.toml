@@ -58,7 +58,7 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
-#androidx-compose-material3-window-size-class = { module = "androidx.compose.material3:material3-window-size-class", version.ref = "compose-material3" }
+androidx-compose-material3-windowSizeClass = { module = "androidx.compose.material3:material3-window-size-class", version.ref = "compose-material3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
