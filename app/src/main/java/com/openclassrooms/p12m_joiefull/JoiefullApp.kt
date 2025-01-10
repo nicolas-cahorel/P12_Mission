@@ -13,7 +13,7 @@ import org.koin.core.context.startKoin
  * application context to Koin and loads the necessary modules to manage dependencies throughout
  * the application's lifecycle.
  */
-class MainApplication : Application() {
+class JoiefullApp : Application() {
 
     /**
      * Called when the application is starting, before any activity, service, or receiver objects
@@ -28,7 +28,7 @@ class MainApplication : Application() {
         // Start Koin for dependency injection
         startKoin {
             // Provide the application context to Koin
-            androidContext(this@MainApplication)
+            androidContext(this@JoiefullApp)
 
             // Load the Koin modules that define dependencies
             modules(appModule, dataModule)

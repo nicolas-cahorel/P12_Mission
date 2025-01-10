@@ -1,13 +1,12 @@
 package com.openclassrooms.p12m_joiefull.di
 
 import com.openclassrooms.p12m_joiefull.data.repository.ItemsRepository
-import com.openclassrooms.p12m_joiefull.ui.details.DetailScreenViewModel
-import com.openclassrooms.p12m_joiefull.ui.products.HomeScreenViewModel
+import com.openclassrooms.p12m_joiefull.ui.detailScreen.DetailScreenViewModel
+import com.openclassrooms.p12m_joiefull.ui.homeScreen.HomeScreenViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.module
 
 /**

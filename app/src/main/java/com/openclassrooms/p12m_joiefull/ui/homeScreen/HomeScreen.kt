@@ -1,9 +1,8 @@
-package com.openclassrooms.p12m_joiefull.ui.products
+package com.openclassrooms.p12m_joiefull.ui.homeScreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -102,10 +101,18 @@ fun HomeScreen(
 
         // Display the list of categories and related items
         is HomeScreenState.DisplayItems -> {
-            CategoriesColumn(
-                categories = state.categories,
-                navController = navController
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = MaterialTheme.colorScheme.surface),
+                contentAlignment = Alignment.Center,
+
+            ) {
+                CategoriesColumn(
+                    categories = state.categories,
+                    navController = navController
+                )
+            }
         }
     }
 }
@@ -178,7 +185,7 @@ private fun ProductColumn(
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
             .clickable {
-                navController.navigate("details/${item.id}")
+                navController.navigate("DetailScreen/${item.id}")
             }
     ) {
 
@@ -352,24 +359,14 @@ private fun InformationBox(
 
 @Preview
 @Composable
-private fun PreviewProductsScreen() {
+private fun PreviewHomeScreen() {
 
     val fakeNavController = rememberNavController()
     val fakeState = HomeScreenState.DisplayItems(
         listOf(
             Category(
                 "Hauts", listOf(
-                    Item(
-                        1,
-                        "url",
-                        "Veste urbaine",
-                        "Veste urbaine",
-                        24,
-                        4.3f,
-                        89.00,
-                        120.00,
-                        "haut"
-                    ),
+                    Item(1, "url", "Veste urbaine", "Veste urbaine", 24, 4.3f, 89.00, 120.00, "haut"),
                     Item(2, "url", "Pull torsadé", "Pull torsadé", 56, 4.6f, 69.00, 95.00, "haut")
                 )
             ),
@@ -377,17 +374,7 @@ private fun PreviewProductsScreen() {
             Category(
                 "Bas", listOf(
                     Item(3, "url", "Jean slim", "Jean slim", 40, 4.3f, 49.00, 65.00, "bas"),
-                    Item(
-                        4,
-                        "url",
-                        "Pantalon large",
-                        "Pantalon large",
-                        38,
-                        4.2f,
-                        54.00,
-                        70.00,
-                        "bas"
-                    )
+                    Item(4, "url", "Pantalon large", "Pantalon large", 38, 4.2f, 54.00, 70.00, "bas")
                 )
             ),
 
@@ -403,61 +390,6 @@ private fun PreviewProductsScreen() {
     HomeScreen(
         navController = fakeNavController,
         state = fakeState
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun PreviewCategoriesColumn() {
-    val fakeNavController = rememberNavController()
-    val sampleCategories = listOf(
-        Category(
-            name = "Electronics",
-            items = listOf(
-                Item(
-                    id = 1,
-                    url = "https://xsgames.co/randomusers/assets/avatars/male/1.jpg",
-                    description = "Smartphone Image",
-                    name = "Smartphone",
-                    likes = 100,
-                    rating = 4.5f,
-                    price = 299.99,
-                    originalPrice = 349.99,
-                    category = "Electronics"
-                ),
-                Item(
-                    id = 2,
-                    url = "https://xsgames.co/randomusers/assets/avatars/female/2.jpg",
-                    description = "Laptop Image",
-                    name = "Laptop",
-                    likes = 150,
-                    rating = 4.7f,
-                    price = 999.99,
-                    originalPrice = 1199.99,
-                    category = "Electronics"
-                )
-            )
-        ),
-        Category(
-            name = "Books",
-            items = listOf(
-                Item(
-                    id = 3,
-                    url = "https://xsgames.co/randomusers/assets/avatars/male/3.jpg",
-                    description = "Book Cover",
-                    name = "Science Fiction Book",
-                    likes = 80,
-                    rating = 4.2f,
-                    price = 19.99,
-                    originalPrice = 24.99,
-                    category = "Books"
-                )
-            )
-        )
-    )
-    CategoriesColumn(
-        categories = sampleCategories,
-        navController = fakeNavController
     )
 }
 

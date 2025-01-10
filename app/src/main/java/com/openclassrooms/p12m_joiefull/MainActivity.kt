@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.ui.platform.LocalConfiguration
 import com.openclassrooms.p12m_joiefull.ui.navigation.Navigation
 import com.openclassrooms.p12m_joiefull.ui.theme.JoiefullTheme
 
@@ -28,10 +29,14 @@ class MainActivity : ComponentActivity() {
 
         // Setting the content view of the activity using Compose
         setContent {
+
+            // description
             val windowSizeClass = calculateWindowSizeClass(this)
+
             // Applying the app's theme to the content
             JoiefullTheme {
-                // Setting up the main composable of the app
+
+                // Setting up navigation of the app
                 Navigation(windowSizeClass)
             }
         }

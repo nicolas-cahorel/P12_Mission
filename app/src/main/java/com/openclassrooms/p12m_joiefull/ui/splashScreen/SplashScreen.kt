@@ -1,4 +1,4 @@
-package com.openclassrooms.p12m_joiefull.ui.splash
+package com.openclassrooms.p12m_joiefull.ui.splashScreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,8 +31,8 @@ fun SplashScreen(navController: NavController) {
 
     LaunchedEffect(Unit) {
         delay(2000)
-        navController.navigate(Routes.Products.route) {
-            popUpTo(Routes.Splash.route) { inclusive = true }
+        navController.navigate(Routes.HomeScreen.route) {
+            popUpTo(Routes.SplashScreen.route) { inclusive = true }
         }
     }
     Box(

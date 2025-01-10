@@ -1,4 +1,4 @@
-package com.openclassrooms.p12m_joiefull.ui.details
+package com.openclassrooms.p12m_joiefull.ui.detailScreen
 
 import android.content.Context
 import android.content.Intent
@@ -29,13 +29,11 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -76,7 +74,7 @@ import com.openclassrooms.p12m_joiefull.ui.theme.LocalExtendedColors
  */
 @Composable
 fun DetailScreen(
-    widthSizeClass: WindowWidthSizeClass,
+    smartphoneDisplay: Boolean,
     navController: NavController,
     state: DetailScreenState,
 ) {
@@ -130,7 +128,7 @@ fun DetailScreen(
                     .padding(16.dp)
             ) {
                 PictureBox(
-                    widthSizeClass = widthSizeClass,
+                    smartphoneDisplay = smartphoneDisplay,
                     navController = navController,
                     item = state.item
                 )
@@ -153,7 +151,7 @@ fun DetailScreen(
  */
 @Composable
 private fun PictureBox(
-    widthSizeClass: WindowWidthSizeClass,
+    smartphoneDisplay: Boolean,
     navController: NavController,
     item: Item
 ) {
@@ -231,35 +229,26 @@ private fun PictureBox(
                 }
         )
 
-        when (widthSizeClass) {
-            WindowWidthSizeClass.Compact, WindowWidthSizeClass.Medium -> {
-                // Back button icon
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(16.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
-                            shape = CircleShape
-                        )
-                        .size(24.dp)
-                        .padding(3.dp)
-                        .clickable { navController.popBackStack() }
-                )
-            }
-
-            else -> {
-                //do nothing
-            }
+        if (smartphoneDisplay) {
+            // Back button icon
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(16.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
+                        shape = CircleShape
+                    )
+                    .size(24.dp)
+                    .padding(3.dp)
+                    .clickable { navController.popBackStack() }
+            )
         }
     }
-
-
 }
-
 
 /**
  * Displays the item's description and additional details (name, price, original price, etc.).
@@ -436,7 +425,7 @@ private fun UserRatingBar(
     size: Dp = 64.dp,
     ratingState: MutableState<Int> = remember { mutableIntStateOf(0) },
 ) {
-    val extendedColors = LocalExtendedColors.current
+
 
     Row(
         modifier = Modifier.wrapContentSize(),
@@ -448,9 +437,7 @@ private fun UserRatingBar(
             StarIcon(
                 size = size,
                 ratingValue = value,
-                ratingState = ratingState,
-                selectedColor = extendedColors.orange,
-                unselectedColor = Color(0xFFA2ADB1)
+                ratingState = ratingState
             )
         }
     }
@@ -462,29 +449,27 @@ private fun UserRatingBar(
  * @param size The size of the star icon.
  * @param ratingState The current rating state (keeps track of the user's rating).
  * @param ratingValue The specific rating value for this star (1-5).
- * @param selectedColor The color of the star when it's selected (filled).
- * @param unselectedColor The color of the star when it's unselected (empty).
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun StarIcon(
     size: Dp,
     ratingState: MutableState<Int>,
-    ratingValue: Int,
-    selectedColor: Color,
-    unselectedColor: Color
+    ratingValue: Int
 ) {
+    val extendedColors = LocalExtendedColors.current
+
     // Color animation based on the current rating
     val tint by animateColorAsState(
-        targetValue = if (ratingValue <= ratingState.value) selectedColor else unselectedColor,
+        targetValue = if (ratingValue <= ratingState.value) extendedColors.orange else Color.Gray,
         label = ""
     )
 
     // Determine which icon to use based on the rating value
-    val icon = if (ratingValue <= ratingState.value) Icons.Outlined.Star else Icons.Default.Star
+    val icon = if (ratingValue <= ratingState.value) R.drawable.star_icon else R.drawable.outlined_star_icon
 
     Icon(
-        imageVector = icon,
+        painter = painterResource(icon),
         tint = tint,
         contentDescription = null,
         modifier = Modifier
@@ -522,7 +507,7 @@ private fun shareContent(context: Context, content: String) {
 
 @Preview(showBackground = true)
 @Composable
-private fun PreviewDetailsScreen() {
+private fun PreviewDetailScreen() {
     val navController = rememberNavController()
     val fakeState = DetailScreenState.DisplayDetail(
         Item(
@@ -539,7 +524,7 @@ private fun PreviewDetailsScreen() {
     )
 
     DetailScreen(
-        widthSizeClass = WindowWidthSizeClass.Compact,
+        smartphoneDisplay = true,
         navController = navController,
         state = fakeState
     )
@@ -562,7 +547,7 @@ private fun PreviewPictureBox() {
     )
 
     PictureBox(
-        widthSizeClass = WindowWidthSizeClass.Compact,
+        smartphoneDisplay = true,
         navController = navController,
         item = fakeItem
     )

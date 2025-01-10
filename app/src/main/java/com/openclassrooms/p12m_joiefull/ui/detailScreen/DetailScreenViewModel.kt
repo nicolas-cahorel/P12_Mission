@@ -1,4 +1,4 @@
-package com.openclassrooms.p12m_joiefull.ui.details
+package com.openclassrooms.p12m_joiefull.ui.detailScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -46,7 +46,7 @@ class DetailScreenViewModel(
      *
      * @param itemId The ID of the item to be fetched from the repository.
      */
-    fun loadItem(itemId: Int) {
+    private fun loadItem(itemId: Int) {
         viewModelScope.launch(dispatcher) {
 
             // Collect the flow from the repository and handle the result

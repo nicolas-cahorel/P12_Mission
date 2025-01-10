@@ -1,7 +1,3 @@
 <resources>
     <string name="app_name">P12M_joiefull</string>
-    <string name="category_accessories">ACCESSORIES</string>
-    <string name="category_bottoms">BOTTOMS</string>
-    <string name="category_shoes">SHOES</string>
-    <string name="category_tops">TOPS</string>
 </resources>

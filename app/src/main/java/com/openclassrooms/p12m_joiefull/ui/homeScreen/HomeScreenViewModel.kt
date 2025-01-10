@@ -1,4 +1,4 @@
-package com.openclassrooms.p12m_joiefull.ui.products
+package com.openclassrooms.p12m_joiefull.ui.homeScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

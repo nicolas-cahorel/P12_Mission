@@ -1,4 +1,4 @@
-package com.openclassrooms.p12m_joiefull.ui.details
+package com.openclassrooms.p12m_joiefull.ui.detailScreen
 
 import com.openclassrooms.p12m_joiefull.data.model.Item
 
