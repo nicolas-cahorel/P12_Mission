@@ -3,9 +3,11 @@ package com.openclassrooms.p12m_joiefull.ui.detailScreen
 import android.content.Context
 import android.content.Intent
 import android.view.MotionEvent
+import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Share
@@ -292,7 +295,7 @@ private fun InformationBox(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(40.dp) // Taille ajustée pour ressembler au design
+            .height(40.dp)
             .background(MaterialTheme.colorScheme.surface)
     ) {
 
@@ -307,8 +310,8 @@ private fun InformationBox(
                 fontWeight = FontWeight.Bold
             ),
             color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 2, // Permet un nombre illimité de lignes
-            overflow = TextOverflow.Ellipsis // Si le texte dépasse, il sera tronqué
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
         )
 
         // Rating display
@@ -365,6 +368,7 @@ private fun UserInput(url: String) {
 
     var userComment by rememberSaveable { mutableStateOf("") }
     val ratingState = rememberSaveable { mutableIntStateOf(0) }
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -379,9 +383,9 @@ private fun UserInput(url: String) {
                 modifier = Modifier
                     .padding(end = 8.dp)
                     .size(40.dp)
-                    .clip(CircleShape), // Applique les coins arrondis
+                    .clip(CircleShape),
 
-                contentScale = ContentScale.Crop, // Remplit la box en coupant si nécessaire
+                contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = R.drawable.ic_launcher_background)
             )
 
@@ -394,23 +398,61 @@ private fun UserInput(url: String) {
         // User's comment input
         OutlinedTextField(
             value = userComment,
-            onValueChange = {
-                userComment = it
-            },
+            onValueChange = { userComment = it },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 10.dp),
             placeholder = {
                 Text(
-                    text = "Partagez ici vos impressions sur cette pièce", // Texte d'indication
+                    text = "Partagez ici vos impressions sur cette pièce",
                     style = MaterialTheme.typography.bodySmall.copy(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f), // Couleur grise pour le placeholder
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         fontSize = 14.sp
                     ),
                 )
             },
             shape = RoundedCornerShape(15.dp)
         )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+
+                    .background(
+                        color = MaterialTheme.colorScheme.surface,
+                        shape = CircleShape
+                    )
+                    .border(
+                        width = 2.dp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        shape = CircleShape
+                    )
+                    .size(36.dp)
+                    .clickable {
+                        if (ratingState.intValue > 0 && userComment.isNotEmpty()) {
+                            ratingState.intValue = 0
+                            userComment = ""
+                            Toast.makeText(context, "Votre avis a été ajouté", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Veuillez saisir une note et un commentaire",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+            )
+        }
+
     }
 }
 
@@ -425,7 +467,6 @@ private fun UserRatingBar(
     size: Dp = 64.dp,
     ratingState: MutableState<Int> = remember { mutableIntStateOf(0) },
 ) {
-
 
     Row(
         modifier = Modifier.wrapContentSize(),
@@ -466,7 +507,8 @@ fun StarIcon(
     )
 
     // Determine which icon to use based on the rating value
-    val icon = if (ratingValue <= ratingState.value) R.drawable.star_icon else R.drawable.outlined_star_icon
+    val icon =
+        if (ratingValue <= ratingState.value) R.drawable.star_icon else R.drawable.outlined_star_icon
 
     Icon(
         painter = painterResource(icon),
@@ -494,8 +536,8 @@ fun StarIcon(
 private fun shareContent(context: Context, content: String) {
 
     val intent = Intent(Intent.ACTION_SEND).apply {
-        type = "text/plain" // Type MIME pour le texte
-        putExtra(Intent.EXTRA_TEXT, content) // Contenu à partager
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, content)
     }
 
     if (intent.resolveActivity(context.packageManager) != null) {
@@ -567,7 +609,7 @@ private fun PreviewDescriptionColumn() {
         originalPrice = 95.00,
         category = "haut"
     )
-    // Exemple de données factices pour la preview
+
     DescriptionColumn(
         item = fakeItem
     )
@@ -578,4 +620,3 @@ private fun PreviewDescriptionColumn() {
 private fun PreviewUserInput() {
     UserInput(url = "https://example.com/avatar.jpg")
 }
-

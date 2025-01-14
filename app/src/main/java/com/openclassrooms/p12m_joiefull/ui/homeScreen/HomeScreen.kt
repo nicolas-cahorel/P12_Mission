@@ -107,7 +107,7 @@ fun HomeScreen(
                     .background(color = MaterialTheme.colorScheme.surface),
                 contentAlignment = Alignment.Center,
 
-            ) {
+                ) {
                 CategoriesColumn(
                     categories = state.categories,
                     navController = navController
@@ -366,7 +366,17 @@ private fun PreviewHomeScreen() {
         listOf(
             Category(
                 "Hauts", listOf(
-                    Item(1, "url", "Veste urbaine", "Veste urbaine", 24, 4.3f, 89.00, 120.00, "haut"),
+                    Item(
+                        1,
+                        "url",
+                        "Veste urbaine",
+                        "Veste urbaine",
+                        24,
+                        4.3f,
+                        89.00,
+                        120.00,
+                        "haut"
+                    ),
                     Item(2, "url", "Pull torsadé", "Pull torsadé", 56, 4.6f, 69.00, 95.00, "haut")
                 )
             ),
@@ -374,7 +384,17 @@ private fun PreviewHomeScreen() {
             Category(
                 "Bas", listOf(
                     Item(3, "url", "Jean slim", "Jean slim", 40, 4.3f, 49.00, 65.00, "bas"),
-                    Item(4, "url", "Pantalon large", "Pantalon large", 38, 4.2f, 54.00, 70.00, "bas")
+                    Item(
+                        4,
+                        "url",
+                        "Pantalon large",
+                        "Pantalon large",
+                        38,
+                        4.2f,
+                        54.00,
+                        70.00,
+                        "bas"
+                    )
                 )
             ),
 
