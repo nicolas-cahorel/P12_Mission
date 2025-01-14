@@ -98,4 +98,7 @@ dependencies {
     // Material3 window size class
     implementation(libs.androidx.compose.material3.windowSizeClass)
 
+    // Jacoco code coverage
+    implementation(libs.org.jacoco.core) // Utilisation de la dépendance définie dans libs.versions.toml
+
 }

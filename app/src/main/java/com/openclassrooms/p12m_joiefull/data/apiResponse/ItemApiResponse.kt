@@ -19,7 +19,7 @@ import com.squareup.moshi.JsonClass
  * @property originalPrice The original price of the item before any discounts or promotions.
  */
 @JsonClass(generateAdapter = true)
-data class ItemsApiResponse(
+data class ItemApiResponse(
     @Json(name = "id") val id: Int,
     @Json(name = "picture") val picture: PictureApiResponse,
     @Json(name = "name") val name: String,
@@ -44,14 +44,14 @@ data class PictureApiResponse(
 )
 
 /**
- * Extension function to transform a list of [ItemsApiResponse] into a list of [Category].
+ * Extension function to transform a list of [ItemApiResponse] into a list of [Category].
  *
  * Each [Category] object contains a name and the list of items that belong to that category.
  * The items are grouped by their category name.
  *
  * @return A list of [Category] objects, each containing the category name and a list of [Item] objects.
  */
-fun List<ItemsApiResponse>.categorizedItems(): List<Category> {
+fun List<ItemApiResponse>.categorizedItems(): List<Category> {
 
     // Group the items by their category name.
     val categories = this.groupBy { it.category }
@@ -78,13 +78,13 @@ fun List<ItemsApiResponse>.categorizedItems(): List<Category> {
 }
 
 /**
- * Extension function to transform a list of [ItemsApiResponse] into a flat list of [Item].
+ * Extension function to transform a list of [ItemApiResponse] into a flat list of [Item].
  *
- * This function maps each [ItemsApiResponse] into a corresponding [Item] object without grouping by category.
+ * This function maps each [ItemApiResponse] into a corresponding [Item] object without grouping by category.
  *
  * @return A list of [Item] objects, each representing an individual item.
  */
-fun List<ItemsApiResponse>.toItems(): List<Item> {
+fun List<ItemApiResponse>.toItems(): List<Item> {
 
     return this.map {
         Item(

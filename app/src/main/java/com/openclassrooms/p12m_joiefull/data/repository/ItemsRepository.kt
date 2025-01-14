@@ -66,9 +66,12 @@ class ItemsRepository(private val dataService: ItemsClient) {
     /**
      * Fetches a specific item by its ID from the API.
      *
-     * This function emits a [Flow] of [ItemResult], representing the result of the operation:
+     * This function emits a [Flow] of [ItemResult], which represents the result of the operation:
      * - [ItemResult.Success] if the item is successfully retrieved.
      * - [ItemResult.Error] if the item cannot be found or an error occurs during the API call.
+     *
+     * The function handles different scenarios, including network errors, empty API responses,
+     * and client/server errors. The error messages are descriptive to aid in debugging.
      *
      * @param itemId The ID of the item to fetch.
      * @return A [Flow] emitting [ItemResult], containing either the fetched item or an error message.
@@ -82,12 +85,18 @@ class ItemsRepository(private val dataService: ItemsClient) {
             200 -> {
                 val items = apiResponse.body()
                 if (!items.isNullOrEmpty()) {
-                    // Find the item by ID and emit success if found
-                    items.toItems().find { it.id == itemId }
-                        ?.let { emit(ItemResult.Success(it)) }
+                    // Look for the item with the given ID
+                    val item = items.toItems().find { it.id == itemId }
+                    if (item != null) {
+                        // Emit success if the item is found
+                        emit(ItemResult.Success(item))
+                    } else {
+                        // Emit an error if the item is not found
+                        emit(ItemResult.Error("Product not found."))
+                    }
                 } else {
-                    // Emit an error if the response body is empty
-                    emit(ItemResult.Error("Product not found."))
+                    // Emit error if the response body is empty
+                    emit(ItemResult.Error("No products available."))
                 }
             }
 
