@@ -9,6 +9,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.openclassrooms.p12m_joiefull.R
@@ -47,7 +49,7 @@ fun SplashScreen(navController: NavController) {
         // Display the application logo.
         Image(
             painter = painterResource(id = R.drawable.joiefull_logo),
-            contentDescription = "Logo de l'application"
+            contentDescription = null
         )
     }
 }

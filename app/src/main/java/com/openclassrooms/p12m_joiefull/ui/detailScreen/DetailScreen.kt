@@ -54,6 +54,11 @@ import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -92,6 +97,7 @@ fun DetailScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(color = extendedColors.orange)
+                    .semantics { contentDescription = "Chargement en cours" }
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.joiefull_logo),
@@ -109,12 +115,14 @@ fun DetailScreen(
         // Display error message
         is DetailScreenState.Error -> {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surface),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = state.message,
-                    color = MaterialTheme.colorScheme.error,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center
                 )
@@ -127,6 +135,7 @@ fun DetailScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surface)
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp)
             ) {
@@ -163,10 +172,10 @@ private fun PictureBox(
 
     Box(
         modifier = Modifier
+            .background(MaterialTheme.colorScheme.surface)
             .fillMaxWidth()
             .height(500.dp)
-            .clip(MaterialTheme.shapes.large) // Coins arrondis
-            .background(MaterialTheme.colorScheme.surface)
+            .clip(MaterialTheme.shapes.large)
     ) {
 
         // Image display with rounded corners
@@ -175,7 +184,8 @@ private fun PictureBox(
             contentDescription = item.description,
             modifier = Modifier
                 .fillMaxSize()
-                .clip(MaterialTheme.shapes.medium),
+                .clip(MaterialTheme.shapes.medium)
+                .semantics { contentDescription = "Image de l'article : ${item.description}" },
             contentScale = ContentScale.Crop,
             placeholder = painterResource(id = R.drawable.ic_launcher_background)
         )
@@ -189,17 +199,26 @@ private fun PictureBox(
                     color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
                     shape = MaterialTheme.shapes.medium
                 )
-                .padding(horizontal = 8.dp, vertical = 4.dp),
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+                .clickable {
+                    isFavorite.value = !isFavorite.value
+                    val message = if (isFavorite.value) {
+                        "Article ajouté aux favoris"
+                    } else {
+                        "Article retiré des favoris"
+                    }
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                           },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = if (isFavorite.value) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                contentDescription = if (isFavorite.value) "Remove from favorites" else "Add to favorites",
+                contentDescription = if (isFavorite.value) "Bouton retirer des favoris" else "Bouton ajouter aux favoris",
                 tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .size(16.dp)
                     .padding(end = 4.dp)
-                    .clickable { isFavorite.value = !isFavorite.value }
+
             )
             Text(
                 text = item.likes.toString(),
@@ -211,7 +230,7 @@ private fun PictureBox(
         // Share icon
         Icon(
             imageVector = Icons.Default.Share,
-            contentDescription = null,
+            contentDescription = "Bouton partager cet article",
             tint = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -223,11 +242,11 @@ private fun PictureBox(
                 .size(24.dp)
                 .padding(3.dp)
                 .clickable {
-                    val shareText = "Check out this item: ${item.name}\n" +
+                    val shareText = "Cet article pourrait vous interresser: ${item.name}\n" +
                             "Description: ${item.description}\n" +
-                            "Price: ${item.price}€\n" +
-                            "Original Price: ${item.originalPrice}€\n" +
-                            "Link: ${item.url}"
+                            "Prix: ${item.price}€\n" +
+                            "Ancien Price: ${item.originalPrice}€\n" +
+                            "Photo de l'article: ${item.url}"
                     shareContent(context, shareText)
                 }
         )
@@ -236,7 +255,7 @@ private fun PictureBox(
             // Back button icon
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = null,
+                contentDescription = "Bouton retour à l'écran principal",
                 tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .align(Alignment.TopStart)
@@ -272,7 +291,8 @@ private fun DescriptionColumn(
         Text(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 15.dp),
+                .padding(top = 15.dp)
+                .semantics { contentDescription = "Descritpion de l'article : ${item.description}" },
             text = item.description,
             style = MaterialTheme.typography.bodySmall.copy(fontSize = 14.sp),
             color = MaterialTheme.colorScheme.onSurface
@@ -303,7 +323,8 @@ private fun InformationBox(
         Text(
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .widthIn(max = 200.dp),
+                .widthIn(max = 200.dp)
+                .semantics { contentDescription = "Nom de l'article : ${item.name}" },
             text = item.name,
             style = MaterialTheme.typography.bodySmall.copy(
                 fontSize = 14.sp,
@@ -322,7 +343,7 @@ private fun InformationBox(
         ) {
             Icon(
                 imageVector = Icons.Default.Star,
-                contentDescription = "rating icon",
+                contentDescription = null,
                 tint = extendedColors.orange,
                 modifier = Modifier
                     .size(16.dp)
@@ -331,14 +352,16 @@ private fun InformationBox(
             Text(
                 text = item.rating.toString(),
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 14.sp),
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.semantics { contentDescription = "Evaluation de l'article : ${item.rating} étoiles" }
             )
         }
 
         // Price
         Text(
             modifier = Modifier
-                .align(Alignment.BottomStart),
+                .align(Alignment.BottomStart)
+                .semantics { contentDescription = "Prix de l'article : ${item.price.toInt()} euros ${"%.0f".format((item.price % 1) * 100)}" },
             text = item.price.toString() + "€",
             style = MaterialTheme.typography.bodySmall.copy(fontSize = 14.sp),
             color = MaterialTheme.colorScheme.onSurface
@@ -347,7 +370,8 @@ private fun InformationBox(
         // Original price
         Text(
             modifier = Modifier
-                .align(Alignment.BottomEnd),
+                .align(Alignment.BottomEnd)
+                .semantics { contentDescription = "Ancien prix de l'article : ${item.originalPrice.toInt()} euros ${"%.0f".format((item.originalPrice % 1) * 100)}" },
             text = item.originalPrice.toString() + "€",
             style = MaterialTheme.typography.bodySmall.copy(
                 textDecoration = TextDecoration.LineThrough,
@@ -373,18 +397,19 @@ private fun UserInput(url: String) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .background(color = MaterialTheme.colorScheme.surface)
     ) {
 
         // Avatar and rating bar
         Row(verticalAlignment = Alignment.CenterVertically) {
             AsyncImage(
                 model = url,
-                contentDescription = "user's avatar",
+                contentDescription = "Avatar de l'utilisateur",
                 modifier = Modifier
+                    .background(color = MaterialTheme.colorScheme.surface)
                     .padding(end = 8.dp)
                     .size(40.dp)
                     .clip(CircleShape),
-
                 contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = R.drawable.ic_launcher_background)
             )
@@ -401,7 +426,9 @@ private fun UserInput(url: String) {
             onValueChange = { userComment = it },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 10.dp),
+                .padding(top = 10.dp)
+                .background(color = MaterialTheme.colorScheme.surface)
+                .semantics { contentDescription = "Champ de saisie pour votre avis sur l'article" },
             placeholder = {
                 Text(
                     text = "Partagez ici vos impressions sur cette pièce",
@@ -418,10 +445,11 @@ private fun UserInput(url: String) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
+                .background(color = MaterialTheme.colorScheme.surface)
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = null,
+                contentDescription = "Bouton d'ajout de votre avis",
                 tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
@@ -469,7 +497,9 @@ private fun UserRatingBar(
 ) {
 
     Row(
-        modifier = Modifier.wrapContentSize(),
+        modifier = Modifier
+            .wrapContentSize()
+            .background(color = MaterialTheme.colorScheme.surface),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -513,17 +543,15 @@ fun StarIcon(
     Icon(
         painter = painterResource(icon),
         tint = tint,
-        contentDescription = null,
+        contentDescription = "Attribuez une note à l'article entre 1 et 5 étoiles",
         modifier = Modifier
             .size(size)
-            .pointerInteropFilter {
-                when (it.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        ratingState.value = ratingValue
-                    }
-                }
-                true
-            }
+            .clickable {
+                ratingState.value = ratingValue }
+                .semantics {
+            liveRegion = LiveRegionMode.Polite
+            contentDescription = "Attribuez la note de $ratingValue étoiles"
+        }
     )
 }
 
