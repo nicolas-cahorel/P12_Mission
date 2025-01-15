@@ -2,7 +2,6 @@ package com.openclassrooms.p12m_joiefull.ui.detailScreen
 
 import android.content.Context
 import android.content.Intent
-import android.view.MotionEvent
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
@@ -46,18 +45,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.liveRegion
-import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -208,12 +202,12 @@ private fun PictureBox(
                         "Article retiré des favoris"
                     }
                     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                           },
+                },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = if (isFavorite.value) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                contentDescription = if (isFavorite.value) "Bouton retirer des favoris" else "Bouton ajouter aux favoris",
+                contentDescription = if (isFavorite.value) "Retirer des favoris" else "Ajouter aux favoris",
                 tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .size(16.dp)
@@ -230,7 +224,7 @@ private fun PictureBox(
         // Share icon
         Icon(
             imageVector = Icons.Default.Share,
-            contentDescription = "Bouton partager cet article",
+            contentDescription = "Partager cet article",
             tint = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -255,7 +249,7 @@ private fun PictureBox(
             // Back button icon
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Bouton retour à l'écran principal",
+                contentDescription = "Retour à l'écran principal",
                 tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .align(Alignment.TopStart)
@@ -292,7 +286,9 @@ private fun DescriptionColumn(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 15.dp)
-                .semantics { contentDescription = "Descritpion de l'article : ${item.description}" },
+                .semantics {
+                    contentDescription = "Descritpion de l'article : ${item.description}"
+                },
             text = item.description,
             style = MaterialTheme.typography.bodySmall.copy(fontSize = 14.sp),
             color = MaterialTheme.colorScheme.onSurface
@@ -353,7 +349,9 @@ private fun InformationBox(
                 text = item.rating.toString(),
                 style = MaterialTheme.typography.bodySmall.copy(fontSize = 14.sp),
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.semantics { contentDescription = "Evaluation de l'article : ${item.rating} étoiles" }
+                modifier = Modifier.semantics {
+                    contentDescription = "Evaluation de l'article : ${item.rating} étoiles"
+                }
             )
         }
 
@@ -361,7 +359,10 @@ private fun InformationBox(
         Text(
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .semantics { contentDescription = "Prix de l'article : ${item.price.toInt()} euros ${"%.0f".format((item.price % 1) * 100)}" },
+                .semantics {
+                    contentDescription =
+                        "Prix de l'article : ${item.price.toInt()} euros ${"%.0f".format((item.price % 1) * 100)}"
+                },
             text = item.price.toString() + "€",
             style = MaterialTheme.typography.bodySmall.copy(fontSize = 14.sp),
             color = MaterialTheme.colorScheme.onSurface
@@ -371,13 +372,18 @@ private fun InformationBox(
         Text(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .semantics { contentDescription = "Ancien prix de l'article : ${item.originalPrice.toInt()} euros ${"%.0f".format((item.originalPrice % 1) * 100)}" },
+                .semantics {
+                    contentDescription =
+                        "Ancien prix de l'article : ${item.originalPrice.toInt()} euros ${
+                            "%.0f".format((item.originalPrice % 1) * 100)
+                        }"
+                },
             text = item.originalPrice.toString() + "€",
             style = MaterialTheme.typography.bodySmall.copy(
                 textDecoration = TextDecoration.LineThrough,
                 fontSize = 14.sp
             ),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -433,7 +439,7 @@ private fun UserInput(url: String) {
                 Text(
                     text = "Partagez ici vos impressions sur cette pièce",
                     style = MaterialTheme.typography.bodySmall.copy(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 14.sp
                     ),
                 )
@@ -449,7 +455,7 @@ private fun UserInput(url: String) {
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = "Bouton d'ajout de votre avis",
+                contentDescription = "Ajoutez votre avis",
                 tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
@@ -521,7 +527,6 @@ private fun UserRatingBar(
  * @param ratingState The current rating state (keeps track of the user's rating).
  * @param ratingValue The specific rating value for this star (1-5).
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun StarIcon(
     size: Dp,
@@ -547,11 +552,9 @@ fun StarIcon(
         modifier = Modifier
             .size(size)
             .clickable {
-                ratingState.value = ratingValue }
-                .semantics {
-            liveRegion = LiveRegionMode.Polite
-            contentDescription = "Attribuez la note de $ratingValue étoiles"
-        }
+                ratingState.value = ratingValue
+            }
+            .semantics { contentDescription = "Attribuez la note de $ratingValue étoiles" }
     )
 }
 

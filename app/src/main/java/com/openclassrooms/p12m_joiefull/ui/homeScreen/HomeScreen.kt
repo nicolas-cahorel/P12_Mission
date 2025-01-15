@@ -235,8 +235,8 @@ private fun PictureBox(
 
     Box(
         modifier = Modifier
-            .size(180.dp) // Taille ajustée pour ressembler au design
-            .clip(MaterialTheme.shapes.medium) // Coins arrondis
+            .size(180.dp)
+            .clip(MaterialTheme.shapes.medium)
             .background(MaterialTheme.colorScheme.surface)
     ) {
 
@@ -270,12 +270,12 @@ private fun PictureBox(
                         "Article retiré des favoris"
                     }
                     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                           },
+                },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = if (isFavorite.value) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                contentDescription = if (isFavorite.value) "Bouton retirer des favoris" else "Bouton ajouter aux favoris",
+                contentDescription = if (isFavorite.value) "Retirer des favoris" else "Ajouter aux favoris",
                 tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .size(16.dp)
@@ -320,14 +320,14 @@ private fun InformationBox(
                 .align(Alignment.TopStart)
                 .padding(2.dp)
                 .widthIn(max = 140.dp)
-                .clearAndSetSemantics { },
+                .semantics { contentDescription = "Nom de l'article : $name" },
             text = name,
             style = MaterialTheme.typography.bodySmall.copy(
                 fontWeight = FontWeight.Bold
             ),
             color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1, // Permet un nombre illimité de lignes
-            overflow = TextOverflow.Ellipsis // Si le texte dépasse, il sera tronqué
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
 
         // Display the product's rating
@@ -350,7 +350,9 @@ private fun InformationBox(
                 text = rating.toString(),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.semantics { contentDescription = "Evaluation de l'article : $rating étoiles" }
+                modifier = Modifier.semantics {
+                    contentDescription = "Evaluation de l'article : $rating étoiles"
+                }
             )
         }
 
@@ -359,7 +361,10 @@ private fun InformationBox(
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .padding(2.dp)
-                .semantics { contentDescription = "Prix de l'article : ${price.toInt()} euros ${"%.0f".format((price % 1) * 100)}" },
+                .semantics {
+                    contentDescription =
+                        "Prix de l'article : ${price.toInt()} euros ${"%.0f".format((price % 1) * 100)}"
+                },
             text = price.toString() + "€",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurface
@@ -370,12 +375,15 @@ private fun InformationBox(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(2.dp)
-                .semantics { contentDescription = "Ancien prix de l'article : ${originalPrice.toInt()} euros ${"%.0f".format((originalPrice % 1) * 100)}" },
+                .semantics {
+                    contentDescription =
+                        "Ancien prix de l'article : ${originalPrice.toInt()} euros ${"%.0f".format((originalPrice % 1) * 100)}"
+                },
             text = originalPrice.toString() + "€",
             style = MaterialTheme.typography.bodySmall.copy(
                 textDecoration = TextDecoration.LineThrough
             ),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -486,7 +494,7 @@ private fun PreviewProductsRow() {
 @Preview
 @Composable
 private fun PreviewProductColumn() {
-    val fakeNavController = rememberNavController() // NavController factice pour la Preview
+    val fakeNavController = rememberNavController()
     val fakeItem = Item(
         id = 1,
         url = "https://xsgames.co/randomusers/assets/avatars/male/0.jpg",
