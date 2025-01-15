@@ -1,5 +1,6 @@
 package com.openclassrooms.p12m_joiefull.data.repository
 
+import com.openclassrooms.p12m_joiefull.data.apiResponse.ItemApiResponse
 import com.openclassrooms.p12m_joiefull.data.apiResponse.categorizedItems
 import com.openclassrooms.p12m_joiefull.data.apiResponse.toItems
 import com.openclassrooms.p12m_joiefull.data.model.CategoriesResult
@@ -7,6 +8,9 @@ import com.openclassrooms.p12m_joiefull.data.model.ItemResult
 import com.openclassrooms.p12m_joiefull.data.network.ItemsClient
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import retrofit2.Response
+import java.io.IOException
+import java.net.UnknownHostException
 
 /**
  * Repository for fetching categorized items and individual items from the API.
@@ -29,8 +33,20 @@ class ItemsRepository(private val dataService: ItemsClient) {
      */
     fun fetchCategories(): Flow<CategoriesResult> = flow {
 
-//        try {
-        val apiResponse = dataService.getItems()
+        lateinit var apiResponse: Response<List<ItemApiResponse>>
+
+        try {
+            apiResponse = dataService.getItems()
+        } catch (e: IOException) {
+            // Emit an error if there is a connection issue
+            emit(CategoriesResult.Error("Connection error. Please check your Internet connection."))
+        } catch (e: UnknownHostException) {
+            // Emit an error if there is no Internet connection
+            emit(CategoriesResult.Error("No Internet connection. Please check your connection."))
+        } catch (e: Exception) {
+            // Emit a generic error for unexpected exceptions
+            emit(CategoriesResult.Error("An unknown error occurred. Please try again."))
+        }
 
         when (apiResponse.code()) {
             200 -> {
@@ -51,16 +67,6 @@ class ItemsRepository(private val dataService: ItemsClient) {
             else -> emit(CategoriesResult.Error("An unexpected error occurred."))
         }
 
-//        } catch (e: IOException) {
-        // Emit an error if there is a connection issue
-//            emit(CategoriesResult.Error("Connection error. Please check your Internet connection."))
-//        } catch (e: UnknownHostException) {
-        // Emit an error if there is no Internet connection
-//            emit(CategoriesResult.Error("No Internet connection. Please check your connection."))
-//        } catch (e: Exception) {
-        // Emit a generic error for unexpected exceptions
-//            emit(CategoriesResult.Error("An unknown error occurred. Please try again."))
-//        }
     }
 
     /**
@@ -78,8 +84,20 @@ class ItemsRepository(private val dataService: ItemsClient) {
      */
     fun fetchItem(itemId: Int): Flow<ItemResult> = flow {
 
-//        try {
-        val apiResponse = dataService.getItems()
+        lateinit var apiResponse: Response<List<ItemApiResponse>>
+
+        try {
+            apiResponse = dataService.getItems()
+        } catch (e: IOException) {
+            //Emit an error if there is a connection issue
+            emit(ItemResult.Error("Connection error. Please check your Internet connection."))
+        } catch (e: UnknownHostException) {
+            //Emit an error if there is no Internet connection
+            emit(ItemResult.Error("No Internet connection. Please check your connection."))
+        } catch (e: Exception) {
+            //Emit a generic error for unexpected exceptions
+            emit(ItemResult.Error("An unknown error occurred. Please try again."))
+        }
 
         when (apiResponse.code()) {
             200 -> {
@@ -107,15 +125,6 @@ class ItemsRepository(private val dataService: ItemsClient) {
             else -> emit(ItemResult.Error("An unexpected error occurred."))
         }
 
-//        } catch (e: IOException) {
-        // Emit an error if there is a connection issue
-//            emit(ItemResult.Error("Connection error. Please check your Internet connection."))
-//        } catch (e: UnknownHostException) {
-        // Emit an error if there is no Internet connection
-//            emit(ItemResult.Error("No Internet connection. Please check your connection."))
-//        } catch (e: Exception) {
-        // Emit a generic error for unexpected exceptions
-//            emit(ItemResult.Error("An unknown error occurred. Please try again."))
-//        }
     }
+
 }
